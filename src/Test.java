@@ -3,7 +3,7 @@ public class Test {
 		
 		BSTMap<Integer, String> map = new BSTMap<Integer, String>();
 		map.put(1, "test");
-		map.put(2, "testd");
+		map.put(2, "1");
 		map.put(44, "test");
 		map.put(5, "testd");
 		map.put(222, "test");
@@ -20,6 +20,7 @@ public class Test {
 		System.out.println(map.hasKey(2));
 		System.out.println(map.get(1));
 		System.out.println(map.get(2));
+		System.out.println(map.hasValue("testd"));
 		map.test();
 	}
 }

@@ -133,6 +133,12 @@ public class BSTMap<K extends Comparable<? super K>, V>
     @Override()
     public boolean hasValue(V value) {
         //essentially linear search, must look through all values to determine
+        for (Map.Entry<K, V> entry : this.inOrder(this.root)) {
+            if (entry.getValue().equals(value)) {
+                return true;
+            }
+        }
+
         return false;
     }
     
