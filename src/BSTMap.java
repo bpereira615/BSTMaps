@@ -278,21 +278,11 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the min key
      */
     public K firstKey(BNode curr) {
-        //edge case, no nodes
-        if (this.size == 0) {
-            return null;
-        } else if (this.size == 1) {
-            return this.root.key;
+        if (curr.left.isLeaf()) {
+            return curr.key;
         }
 
-        BNode forerunner = curr.left;
-
-        while (!forerunner.isLeaf()) {
-            forerunner = forerunner.left;
-            curr = curr.left;
-        }
-
-        return curr.key;
+        return firstKey(curr.left);
     }
 
     /** Get the smallest key in a subtree.
@@ -300,8 +290,11 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the max key
      */
     public K lastKey(BNode curr) {
-    // Fill in
-        return null;
+        if (curr.right.isLeaf()) {
+            return curr.key;
+        }
+
+        return lastKey(curr.right);
     }
 
     /** Inorder traversal that produces an iterator over key-value pairs.
@@ -368,5 +361,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
     public void test() {
         Collection<Map.Entry<K, V>> test = inOrder(this.root);
         System.out.println(test);
+
+        System.out.println("first: " + firstKey(this.root));
+        System.out.println("first: " + lastKey(this.root));
     }
 }
