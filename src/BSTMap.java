@@ -18,7 +18,11 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+//inOrder Map.Entry collection
 import java.util.AbstractMap;
+
+//entries and values sets
+import java.util.HashSet;
 
 
 /** Binary Search Tree Map implementation with inner Node class.
@@ -238,20 +242,33 @@ public class BSTMap<K extends Comparable<? super K>, V>
     
     @Override()
     public Set<Map.Entry<K, V>> entries() {
-    // Fill in
-        return null;
+        HashSet<Map.Entry<K, V>> entries = new HashSet<>();
+
+        for (Map.Entry<K, V> entry : inOrder(this.root)) {
+            entries.add(entry);
+        }
+        return entries;
     }
 
     @Override()
     public Set<K> keys() {
-    //Fill in
-        return null;
+        HashSet<K> keys = new HashSet<>();
+
+        for (Map.Entry<K, V> entry : inOrder(this.root)) {
+            keys.add(entry.getKey());
+        }
+        return keys;
+
     }
 
     @Override()
     public Collection<V> values() {
-    // Fill in
-        return null;
+        LinkedList<V> values = new LinkedList<>();
+
+        for (Map.Entry<K, V> entry : inOrder(this.root)) {
+            values.add(entry.getValue());
+        }
+        return values;
     }
 
     /* -----   BSTMap-specific functions   ----- */
