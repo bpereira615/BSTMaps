@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+import java.util.AbstractMap;
+
 
 /** Binary Search Tree Map implementation with inner Node class.
  *  @param <K> the base type of the keys in the entries
@@ -293,7 +295,19 @@ public class BSTMap<K extends Comparable<? super K>, V>
     private Collection<Map.Entry<K, V>> inOrder(BNode curr) {
         LinkedList<Map.Entry<K, V>> ordered = new LinkedList<Map.Entry<K, V>>();
 
-    // Fill in
+        if (curr.isLeaf()) {
+            return ordered;
+        }
+
+        //handle left subtree
+        ordered.addAll(inOrder(curr.left));
+
+        //handle current "root"
+        Map.Entry<K, V> entry = new AbstractMap.SimpleEntry<>(curr.key, curr.value);
+        ordered.add(entry);
+
+        //handle right subtree
+        ordered.addAll(inOrder(curr.right));
 
         return ordered;
     }
@@ -328,7 +342,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     /* -----  insert the BSTMapIterator inner class here ----- */
 
-    public BNode test() {
-        return this.root;
+    public void test() {
+        Collection<Map.Entry<K, V>> test = inOrder(this.root);
+        System.out.println(test);
     }
 }
