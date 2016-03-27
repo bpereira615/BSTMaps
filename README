@@ -1,0 +1,16 @@
+Benmin Hoertnagl-Pereira
+bhoertn1
+631-488-7197 
+bhoertn1@jhu.edu
+
+600.226.02 CS226 Data Structures
+Project 3 - BST Maps
+Part 1
+
+Files:
+	MapJHU.java - interface to function similarly to Map ADT
+	
+	BSTMap.java - implementation of the MapJHU.java ADT using binary
+	search tree
+
+
