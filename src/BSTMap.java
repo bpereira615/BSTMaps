@@ -50,7 +50,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
          *  @param k the key for the new node
          *  @param v the value for the new node
          */
-        BNode(K k, V v){
+        BNode(K k, V v) {
             this.key = k;
             this.value = v;
             this.left = null;
@@ -125,11 +125,11 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         //if key is smaller than root key, search left subtree
         if (diff < 0) {
-            return hasKey(key, curr.left);
-        } else if (diff == 0){ //node found
+            return this.hasKey(key, curr.left);
+        } else if (diff == 0) { //node found
             return true;
         } else { //if key is larger than root key, search right subtree
-            return hasKey(key, curr.right);
+            return this.hasKey(key, curr.right);
         }
 
     }
@@ -157,7 +157,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the value associated with the key, or null if not found
      */
     public V get(K key, BNode curr) {
-        //run hasKey operation to find node associated with key, then return value
+        //run hasKey operation to find node associated with key, 
+        //then return value
 
         //reached end, not found
         if (curr.isLeaf()) {
@@ -171,11 +172,11 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         //if key is smaller than root key, search left subtree
         if (diff < 0) {
-            return get(key, curr.left);
-        } else if (diff == 0){ //node found
+            return this.get(key, curr.left);
+        } else if (diff == 0) { //node found
             return curr.value;
         } else { //if key is larger than root key, search right subtree
-            return get(key, curr.right);
+            return this.get(key, curr.right);
         }
     }
 
@@ -214,13 +215,13 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         //if key is smaller than root key, search left subtree
         if (diff < 0) {
-            return put(key, val, curr.left);
-        } else if (diff == 0){ //node found with same key, updated and return old
+            return this.put(key, val, curr.left);
+        } else if (diff == 0) { //node found with key, update and return old
             V oldVal = curr.value;
             curr = new BNode(key, val);
             return oldVal;
         } else { //if key is larger than root key, search right subtree
-            return put(key, val,  curr.right);
+            return this.put(key, val,  curr.right);
         }
 
     }
@@ -244,7 +245,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
     public Set<Map.Entry<K, V>> entries() {
         HashSet<Map.Entry<K, V>> entries = new HashSet<>();
 
-        for (Map.Entry<K, V> entry : inOrder(this.root)) {
+        for (Map.Entry<K, V> entry : this.inOrder(this.root)) {
             entries.add(entry);
         }
         return entries;
@@ -254,7 +255,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
     public Set<K> keys() {
         HashSet<K> keys = new HashSet<>();
 
-        for (Map.Entry<K, V> entry : inOrder(this.root)) {
+        for (Map.Entry<K, V> entry : this.inOrder(this.root)) {
             keys.add(entry.getKey());
         }
         return keys;
@@ -265,7 +266,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
     public Collection<V> values() {
         LinkedList<V> values = new LinkedList<>();
 
-        for (Map.Entry<K, V> entry : inOrder(this.root)) {
+        for (Map.Entry<K, V> entry : this.inOrder(this.root)) {
             values.add(entry.getValue());
         }
         return values;
@@ -282,7 +283,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
             return curr.key;
         }
 
-        return firstKey(curr.left);
+        return this.firstKey(curr.left);
     }
 
     /** Get the smallest key in a subtree.
@@ -294,7 +295,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
             return curr.key;
         }
 
-        return lastKey(curr.right);
+        return this.lastKey(curr.right);
     }
 
     /** Inorder traversal that produces an iterator over key-value pairs.
@@ -316,14 +317,15 @@ public class BSTMap<K extends Comparable<? super K>, V>
         }
 
         //handle left subtree
-        ordered.addAll(inOrder(curr.left));
+        ordered.addAll(this.inOrder(curr.left));
 
         //handle current "root"
-        Map.Entry<K, V> entry = new AbstractMap.SimpleEntry<>(curr.key, curr.value);
+        Map.Entry<K, V> entry = 
+            new AbstractMap.SimpleEntry<>(curr.key, curr.value);
         ordered.add(entry);
 
         //handle right subtree
-        ordered.addAll(inOrder(curr.right));
+        ordered.addAll(this.inOrder(curr.right));
 
         return ordered;
     }
@@ -358,11 +360,15 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     /* -----  insert the BSTMapIterator inner class here ----- */
 
+
+    /**
+     * Simple test to check various functions.
+     */
     public void test() {
-        Collection<Map.Entry<K, V>> test = inOrder(this.root);
+        Collection<Map.Entry<K, V>> test = this.inOrder(this.root);
         System.out.println(test);
 
-        System.out.println("first: " + firstKey(this.root));
-        System.out.println("first: " + lastKey(this.root));
+        System.out.println("first: " + this.firstKey(this.root));
+        System.out.println("first: " + this.lastKey(this.root));
     }
 }
