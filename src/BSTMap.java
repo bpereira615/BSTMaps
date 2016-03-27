@@ -44,7 +44,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
          *  @param k the key for the new node
          *  @param v the value for the new node
          */
-        BNode(K k, V v) {
+        BNode(K k, V v){
             this.key = k;
             this.value = v;
             this.left = null;
@@ -92,16 +92,12 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public boolean hasKey(K key) {
-        
-        //if key is smaller than root key, search left subtree
-        if (key.compareTo(this.root.key) < 0) {
-            return hasKey(key, this.root.left);
-        } else if (key.compareTo(this.root.key) > 0){ //if key is larger than root key, search right subtree
-            return hasKey(key, this.root.right);
+        if (this.size == 0) {
+            return false;
         }
-
-        //key is equal to root key, return true
-        return true;
+        
+        //call helper function
+        return this.hasKey(key, this.root);
     }
 
     /** See if a key is in an entry in a subtree.
@@ -110,30 +106,31 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return true if found, false otherwise
      */
     public boolean hasKey(K key, BNode curr) {
-        //reached a leaf node, not found
-        if (curr.key == null) {
+
+        //reached end, not found
+        if (curr.isLeaf()) {
             return false;
         }
 
-        //the node has been found
-        if (curr.key == key) {
-            return true;
-        }
 
+        //in order search for node with given key
+        int diff = key.compareTo(curr.key);
+
+        
         //if key is smaller than root key, search left subtree
-        if (key.compareTo(curr.key) < 0) {
+        if (diff < 0) {
             return hasKey(key, curr.left);
-        } else if (key.compareTo(curr.key) > 0){ //if key is larger than root key, search right subtree
+        } else if (diff == 0){ //node found
+            return true;
+        } else { //if key is larger than root key, search right subtree
             return hasKey(key, curr.right);
         }
 
-        //TODO: is this needed?
-        return false;
     }
 
     @Override()
     public boolean hasValue(V value) {
-    // Fill in
+        //essentially linear search, must look through all values to determine
         return false;
     }
     
@@ -148,12 +145,31 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the value associated with the key, or null if not found
      */
     public V get(K key, BNode curr) {
-    // Fill in
-        return null;
+        //run hasKey operation to find node associated with key, then return value
+
+        //reached end, not found
+        if (curr.isLeaf()) {
+            return null;
+        }
+
+
+        //in order search for node with given key
+        int diff = key.compareTo(curr.key);
+
+        
+        //if key is smaller than root key, search left subtree
+        if (diff < 0) {
+            return get(key, curr.left);
+        } else if (diff == 0){ //node found
+            return curr.value;
+        } else { //if key is larger than root key, search right subtree
+            return get(key, curr.right);
+        }
     }
 
     @Override()
     public V put(K key, V val) {
+
         return this.put(key, val, this.root);
     }
 
@@ -164,8 +180,37 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the original value associated with the key, or null if not found
      */
     private V put(K key, V val, BNode curr) {
-    // Fill in
-        return null;
+
+        //increment size
+        this.size++;
+
+        if (curr.isLeaf()) {
+
+            //in correct position, insert node
+            curr.key = key;
+            curr.value = val;
+            curr.left = new BNode(null, null);
+            curr.right = new BNode(null, null);
+
+            //TODO: return null for new nodes?
+            return null;
+        }
+
+
+        //in order search for position
+        int diff = key.compareTo(curr.key);
+        
+        //if key is smaller than root key, search left subtree
+        if (diff < 0) {
+            return put(key, val, curr.left);
+        } else if (diff == 0){ //node found with same key, updated and return old
+            V oldVal = curr.value;
+            curr = new BNode(key, val);
+            return oldVal;
+        } else { //if key is larger than root key, search right subtree
+            return put(key, val,  curr.right);
+        }
+
     }
 
     @Override()
@@ -208,8 +253,21 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the min key
      */
     public K firstKey(BNode curr) {
-    // Fill in
-        return null;
+        //edge case, no nodes
+        if (this.size == 0) {
+            return null;
+        } else if (this.size == 1) {
+            return this.root.key;
+        }
+
+        BNode forerunner = curr.left;
+
+        while (!forerunner.isLeaf()) {
+            forerunner = forerunner.left;
+            curr = curr.left;
+        }
+
+        return curr.key;
     }
 
     /** Get the smallest key in a subtree.
@@ -269,4 +327,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
     }
 
     /* -----  insert the BSTMapIterator inner class here ----- */
+
+    public BNode test() {
+        return this.root;
+    }
 }
