@@ -182,9 +182,12 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public V put(K key, V val) {
-        //increment size
-        this.size++;
         
+        if (!this.hasKey(key)) {
+            //increment size
+            this.size++;
+        }
+
         return this.put(key, val, this.root);
     }
 
