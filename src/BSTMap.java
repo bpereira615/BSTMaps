@@ -15,6 +15,7 @@
 
 
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.Map;
@@ -117,16 +118,14 @@ public class BSTMap<K extends Comparable<? super K>, V>
      */
     public boolean hasKey(K key, BNode curr) {
 
-        //reached end, not found
+        //reached end, not found (base case)
         if (curr.isLeaf()) {
             return false;
         }
 
-
         //in order search for node with given key
         int diff = key.compareTo(curr.key);
 
-        
         //if key is smaller than root key, search left subtree
         if (diff < 0) {
             return this.hasKey(key, curr.left);
@@ -169,11 +168,9 @@ public class BSTMap<K extends Comparable<? super K>, V>
             return null;
         }
 
-
         //in order search for node with given key
         int diff = key.compareTo(curr.key);
 
-        
         //if key is smaller than root key, search left subtree
         if (diff < 0) {
             return this.get(key, curr.left);
@@ -203,10 +200,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
      */
     private V put(K key, V val, BNode curr) {
 
-
-
         if (curr.isLeaf()) {
-
             //in correct position, insert node
             curr.key = key;
             curr.value = val;
@@ -216,7 +210,6 @@ public class BSTMap<K extends Comparable<? super K>, V>
             //TODO: return null for new nodes?
             return null;
         }
-
 
         //in order search for position
         int diff = key.compareTo(curr.key);
@@ -237,6 +230,11 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public V remove(K key) {
+        if (this.hasKey(key)) {
+            //increment size
+            this.size--;
+        }
+        
         return this.remove(key, this.root);
     }
 
@@ -246,8 +244,54 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the value associated with the removed key, or null if not found
      */
     public V remove(K key, BNode curr) {
-    // Fill in
-        return null;
+        
+        //in order search for position
+        int diff = key.compareTo(curr.key);
+        
+        if (curr.isLeaf()) {
+            return null;
+        }
+        
+        //if key is smaller than root key, search left subtree
+        if (diff < 0) {
+            return this.remove(key, curr.left);
+        } else if (diff > 0){ //if key is larger than root key, search right subtree
+            return this.remove(key, curr.right);
+        } else if (curr.left != null && curr.right != null) { //has two non-sentinel children
+            V val = curr.value;
+            
+            K firstKey = this.firstKey(curr);
+            curr.value = this.get(curr.key);
+            
+            this.removeMin(curr);
+            
+            curr.key = firstKey;
+            
+            return val;
+        } else { //has 0 or 1 non-sentinel children
+            V val = curr.value;
+            if (curr.left != null) {
+                curr = curr.left;
+            } else {
+                //if left and right are both null, curr becomes null here
+                curr = curr.right;
+            }
+            return val;
+        }
+
+    }
+    
+    /** Search subtree recursively and remove its smallest value.
+     * @param curr the subtree
+     * @return BNode with the min key
+     */
+    public BNode removeMin(BNode curr) {
+        if (curr.left.isLeaf()) {
+            curr = null;
+            return null;
+        }
+
+        return this.removeMin(curr.left);
     }
     
     @Override()
@@ -345,8 +389,38 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @return the resulting submap
      */
     public BSTMap<K, V> subMap(K fromKey, K toKey) {
-    // Fill in
-        return null;
+        
+//        BSTMap<K, V> sub = this;
+//        
+//        BNode curr = sub.root;
+//        while(curr.key.compareTo(fromKey) >= 0) {
+//            curr = curr.left;
+//        }
+//        curr.left = null;
+//        
+//        //remove node after upper bound (and its children too)
+//        curr = root;
+//        while(curr.key.compareTo(fromKey) <= 0) {
+//            curr = curr.right;
+//        }
+//        curr.right = null;
+//        
+//        return sub;
+        
+        BSTMap<K,V> sub = new BSTMap();
+        
+        BNode curr = this.root;
+        while(curr.key.compareTo(fromKey) >= 0) {
+            sub.put(curr.key, curr.value);
+            curr = curr.left;
+        }
+        
+        return sub;
+        
+    }
+    
+    public void getValidNodes(K fromKey, K toKey, BNode curr, BSTMap<K,V> sub) {
+        
     }
 
     /* ---------- from Iterable ---------- */
@@ -369,6 +443,41 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     /* -----  insert the BSTMapIterator inner class here ----- */
 
+//    /**
+//     * Inner BSTMapIterator class for convenience.
+//     * Note that the generic type is implied since we are within DLList<T>.
+//     */
+//    public class BSTMapIterator implements Iterator<BSTMap<K, V>> {
+//
+//        Iterable<Map.Entry<K, V>> ordered;
+//
+//        /**
+//         * Make a BSTMapIterator.
+//         */
+//        public BSTMapIterator() {
+//            this.ordered = BSTMap.this.inOrder();
+//        }
+//
+//        @Override
+//        public boolean hasNext() {
+//            return false;
+//        }
+//
+//        @Override
+//        public BNode<K, V> next() {
+//            //check if map has been changed
+//            if (this.ordered != BSTMap.this.inOrder()) {
+//                throw new ConcurrentModificationException();
+//            }
+//            
+//            return BSTMap.this.get(key);
+//        }
+//
+//        @Override
+//        public void remove() {
+//            
+//        }
+//    }
 
     /**
      * Simple test to check various functions.
