@@ -182,7 +182,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public V put(K key, V val) {
-        
+
         if (!this.hasKey(key)) {
             //increment size
             this.size++;
@@ -222,7 +222,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
             return this.put(key, val, curr.left);
         } else if (diff == 0) { //node found with key, update and return old
             V oldVal = curr.value;
-            curr = new BNode(key, val);
+            curr.key = key;
+            curr.value = val;
             return oldVal;
         } else { //if key is larger than root key, search right subtree
             return this.put(key, val,  curr.right);
