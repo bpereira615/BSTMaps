@@ -19,6 +19,7 @@ import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -260,10 +261,10 @@ public class BSTMap<K extends Comparable<? super K>, V>
         } else if (curr.left != null && curr.right != null) { //has two non-sentinel children
             V val = curr.value;
             
-            K firstKey = this.firstKey(curr);
-            curr.value = this.get(curr.key);
+            K firstKey = this.firstKey(curr.right);
+            curr.value = this.get(firstKey);
             
-            this.removeMin(curr);
+            this.removeMin(curr.right);
             
             curr.key = firstKey;
             
@@ -407,16 +408,16 @@ public class BSTMap<K extends Comparable<? super K>, V>
 //        
 //        return sub;
         
-        BSTMap<K,V> sub = new BSTMap();
+        BSTMap<K,V> sub = new BSTMap<K,V>();
         
-        BNode curr = this.root;
-        while(curr.key.compareTo(fromKey) >= 0) {
-            sub.put(curr.key, curr.value);
-            curr = curr.left;
+        Collection<Map.Entry<K, V>> orderedMap = (Collection<Entry<K, V>>) this.inOrder();
+        
+        for (Map.Entry<K, V> item : orderedMap) {
+            if (item.getKey().compareTo(fromKey) >= 0 || item.getKey().compareTo(toKey) <= 0) {
+                sub.put(item.getKey(), item.getValue());
+            }
         }
-        
         return sub;
-        
     }
     
     public void getValidNodes(K fromKey, K toKey, BNode curr, BSTMap<K,V> sub) {
