@@ -47,6 +47,8 @@ public class BSTMapTest {
     static ArrayList<String> svals;
     static String[] nray = new String[sray.length];
     static ArrayList<String> nvals;
+    static HashSet<AbstractMap.SimpleEntry<Integer,String>> entries;
+    static AbstractMap.SimpleEntry<Integer,String> pair;
 
 
 
@@ -87,6 +89,13 @@ public class BSTMapTest {
             nray[idx] = "N"+val;
             nvals.add(nray[idx]);
             idx++;
+        }
+
+
+        entries = new HashSet<AbstractMap.SimpleEntry<Integer,String>>();
+        for (int i=0; i < iray.length; i++) {
+            pair = new AbstractMap.SimpleEntry<Integer,String>(iray[i],sray[i]);
+            entries.add(pair);
         }
 
     }
@@ -199,17 +208,17 @@ public class BSTMapTest {
 
 
 //TODO: edit for BST implementation
-/*
+
     @Test
     public void testPutCollections() {
         HashSet<Integer> keys = new HashSet<Integer>();
         ArrayList<String> vals = new ArrayList<String>();
-        HashSet<LPMapEntry<Integer,String>> pairs = new HashSet<LPMapEntry<Integer,String>>();
+        HashSet<AbstractMap.SimpleEntry<Integer,String>> pairs = new HashSet<AbstractMap.SimpleEntry<Integer,String>>();
         for (int i=0; i < iray.length; i++) {
             assertNull(e7.put(iray[i],sray[i]));  // new key
             keys.add(iray[i]);
             vals.add(sray[i]);
-            pairs.add(new LPMapEntry<Integer,String>(iray[i],sray[i]));
+            pairs.add(new AbstractMap.SimpleEntry<Integer,String>(iray[i],sray[i]));
             assertEquals(keys, e7.keys());
             assertTrue(sameCollection(e7.values(),vals));
             assertEquals(pairs, e7.entries());
@@ -221,7 +230,7 @@ public class BSTMapTest {
             assertNull(e7.put(key,sray[i]));  // new key
             keys.add(key);  // no dups
             vals.add(sray[i]);  // yes dups
-            pairs.add(new LPMapEntry<Integer,String>(key,sray[i]));
+            pairs.add(new AbstractMap.SimpleEntry<Integer,String>(key,sray[i]));
             assertEquals(keys, e7.keys());
             assertTrue(sameCollection(e7.values(),vals));
             assertEquals(pairs, e7.entries());
@@ -231,7 +240,7 @@ public class BSTMapTest {
             assertEquals(sray[i], e7.get(iray[i]+20));
         }
     }
-    */
+    
 
 
 
@@ -276,10 +285,10 @@ public class BSTMapTest {
 
 
 //TODO: entries for BST implementation
-/*
+
     @Test
     public void testAfterAddAll() {
-        for (LPMapEntry<Integer,String> p : entries) {
+        for (AbstractMap.SimpleEntry<Integer,String> p : entries) {
             e4.put(p.getKey(), p.getValue());
         }
         assertFalse(e4.isEmpty());
@@ -290,7 +299,7 @@ public class BSTMapTest {
     }
 
 
-    */
+    
 
 
 
@@ -304,11 +313,12 @@ public class BSTMapTest {
     @Test
     public void testRemoveAll() {
         int size = all.size();
-        int cap = all.getCapacity();
         Set<Integer> keys = all.keys();
         Collection<String> vals = all.values();
         for (int i=0; i < iray.length; i++) {
             assertEquals(sray[i], all.remove(iray[i])); // returns val
+
+
             size--;
             assertEquals(size, all.size());  // size decrease
             assertNull(all.get(iray[i]));  // key not there now
@@ -319,14 +329,13 @@ public class BSTMapTest {
             assertEquals(keys, all.keys());
             assertTrue(sameCollection(vals, all.values()));
         }
+
         assertTrue(all.isEmpty());
         assertTrue(all.keys().isEmpty());
         assertTrue(all.values().isEmpty());
         assertTrue(all.entries().isEmpty());
         assertEquals(0, all.size());
-        assertEquals(cap, all.getCapacity());  // don't resize even if rehash
-        assertTrue(.5f == all.getMaxLoad());
-        assertTrue(0 == all.getLoad());
+
     }
 
     @Test
@@ -506,40 +515,6 @@ public class BSTMapTest {
         assertTrue(sameCollection(vals, e7.values()));
         assertEquals(pairs, e7.entries());
     }
-
-
-    @Test
-    public void testLinearProbeInsertGetContains() {
-        // start with load factor = 1 to fill 5 slot table
-        // force collisions as you put values in
-        // toString tests only work if the values collection is created
-        // using a linear search through the hash table pairs, add to end
-        LPMapEntry<Integer,String>[] table = new LPMapEntry[5];
-        e7 = new BSTMap<Integer, String>(1.0f);   // load 5 of 5 is max
-        e7.put(0, "0");   // slot 0
-        table[0] = new LPMapEntry<Integer,String>(0, "0");
-        // assertEquals(e7.values().toString(), "[0]");
-        e7.put(10, "1");  // slot 0, probe to 1
-        table[1] = new LPMapEntry<Integer,String>(10, "1");
-        // assertEquals(e7.values().toString(), "[0, 1]");
-        e7.put(4, "4");  // slot 4, no probe
-        table[4] = new LPMapEntry<Integer,String>(4, "4");
-        // assertEquals(e7.values().toString(), "[0, 1, 4]");
-        e7.put(20, "2");  // slot 0, probe to 2
-        table[2] = new LPMapEntry<Integer,String>(20, "2");
-        // assertEquals(e7.values().toString(), "[0, 1, 2, 4]");
-        e7.put(14, "3");  // slot 4, probe to 0, 1, 2, 3
-        table[3] = new LPMapEntry<Integer,String>(14, "3");
-        // assertEquals(e7.values().toString(), "[0, 1, 2, 3, 4]");
-
-        Iterator<LPMapEntry<Integer,String>> it = e7.iterator();
-        int i=0;
-        while (it.hasNext()) {
-            assertEquals(table[i], it.next());
-            i++;
-        }
-    }
-
 
     */
 
