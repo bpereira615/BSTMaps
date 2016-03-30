@@ -3,6 +3,10 @@
  * JHED: bhoertn1 
  * 631-488-7197 
  * bhoertn1@jhu.edu
+ * 
+ * Ryan Demo
+ * JHED: rdemo1
+ * rdemo1@jhu.edu
  *
  * 600.226.02 | CS226 Data Structures | Section 2
  * Project 3, Part A - Binary Search Tree
