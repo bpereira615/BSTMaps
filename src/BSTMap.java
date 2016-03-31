@@ -312,30 +312,29 @@ public class BSTMap<K extends Comparable<? super K>, V>
             
             //edge case deleting root
             if (curr.key == this.root.key) {
-                if (this.root.left.key != null) {
-                    this.root = this.root.left;
-                } else if (this.root.right.key != null) {
-                    //if left and right are both null, curr becomes null here
-                    this.root = this.root.right;
-                } else {
-                    this.root.key = null;
-                    this.root.value = null;
-                }
+                this.removeIncompleteSubTree(curr);
             } else {
-                if (curr.left.key != null) {
-                    curr = curr.left;
-                } else if (curr.right.key != null) {
-                    //if left and right are both null, curr becomes null here
-                    curr = curr.right;
-                } else {
-                    curr.key = null;
-                    curr.value = null;
-                }
+                this.removeIncompleteSubTree(curr);
             }
             
             return val;
         }
 
+    }
+    
+    /** Handles remove case where the node has 0 or 1 non-sentinel children.
+     * @param curr the BNode to remove
+     */
+    public void removeIncompleteSubTree(BNode curr) {
+        if (curr.left.key != null) {
+            curr = curr.left;
+        } else if (curr.right.key != null) {
+            //if left and right are both null, curr becomes null here
+            curr = curr.right;
+        } else {
+            curr.key = null;
+            curr.value = null;
+        }
     }
     
     /** Search subtree recursively and remove its smallest value.
@@ -455,7 +454,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         for (Map.Entry<K, V> item : orderedMap) {
             if (item.getKey().compareTo(fromKey) >= 0
-                    || item.getKey().compareTo(toKey) <= 0) {
+                    && item.getKey().compareTo(toKey) <= 0) {
                 sub.put(item.getKey(), item.getValue());
             }
         }
