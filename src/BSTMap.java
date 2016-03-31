@@ -248,17 +248,24 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         //in order search for position
         int diff = key.compareTo(curr.key);
+
+        System.out.println("Difference: " + diff);
         
-        if (curr.isLeaf()) {
+        if (curr.isLeaf() && diff != 0) {
+
             return null;
         }
         
         //if key is smaller than root key, search left subtree
         if (diff < 0) {
+            
             return this.remove(key, curr.left);
         } else if (diff > 0){ //if key is larger than root key, search right subtree
+
             return this.remove(key, curr.right);
-        } else if (curr.left != null && curr.right != null) { //has two non-sentinel children
+        } else if (curr.left.key != null && curr.right.key != null) { //has two non-sentinel children
+
+
             V val = curr.value;
             
             K firstKey = this.firstKey(curr.right);
@@ -270,12 +277,18 @@ public class BSTMap<K extends Comparable<? super K>, V>
             
             return val;
         } else { //has 0 or 1 non-sentinel children
+
             V val = curr.value;
-            if (curr.left != null) {
+            if (curr.left.key != null) {
                 curr = curr.left;
-            } else {
+            } else if (curr.right.key != null) {
                 //if left and right are both null, curr becomes null here
                 curr = curr.right;
+            } else {
+
+                System.out.println("PRINT HERE!");
+                curr.key = null;
+                curr.value = null;
             }
             return val;
         }
@@ -488,6 +501,6 @@ public class BSTMap<K extends Comparable<? super K>, V>
         System.out.println(test);
 
         System.out.println("first: " + this.firstKey(this.root));
-        System.out.println("first: " + this.lastKey(this.root));
+        System.out.println("last: " + this.lastKey(this.root));
     }
 }
