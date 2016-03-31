@@ -544,6 +544,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
                 BSTMap.this.remove(this.ordered.get(this.pos).getKey());
                 this.ordered.remove(this.pos);
                 this.operationsAtInit++; 
+                this.justRemoved = true;
             } else {
                 throw new IllegalStateException();
             }
