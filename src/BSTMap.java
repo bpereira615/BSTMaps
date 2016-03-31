@@ -503,7 +503,9 @@ public class BSTMap<K extends Comparable<? super K>, V>
         /** Number of operations applied to map at init,
          * used for state check when doing next or remove. */
         int operationsAtInit;
-
+        /** True if the iterator has just removed the last item it
+         * iterated over. Used to filter out calling remove more than once. */
+        boolean justRemoved;
         
 
         /**
@@ -513,6 +515,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
             this.ordered = (new ArrayList<Map.Entry<K, V>>(
                     (Collection<Map.Entry<K, V>>) BSTMap.this.inOrder()));
             this.operationsAtInit = BSTMap.this.operations;
+            this.justRemoved = false;
         }
 
         @Override
@@ -526,23 +529,25 @@ public class BSTMap<K extends Comparable<? super K>, V>
             if (this.operationsAtInit != BSTMap.this.operations) {
                 throw new ConcurrentModificationException();
             }
-
+            this.justRemoved = false;
             this.pos++;
             return this.ordered.get(this.pos);
         }
 
         @Override
         public void remove() {
-
-            if (this.operationsAtInit != BSTMap.this.operations) {
-                throw new ConcurrentModificationException();
+            
+            if (!this.justRemoved) {
+                if (this.operationsAtInit != BSTMap.this.operations) {
+                    throw new ConcurrentModificationException();
+                }
+                BSTMap.this.remove(this.ordered.get(this.pos).getKey());
+                this.ordered.remove(this.pos);
+                this.operationsAtInit++; 
+            } else {
+                throw new IllegalStateException();
             }
-            BSTMap.this.remove(this.ordered.get(this.pos).getKey());
-            this.ordered.remove(this.pos);
-            this.operationsAtInit++;
-
-
-
+            
         }
     }
 
