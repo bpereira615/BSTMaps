@@ -455,7 +455,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         for (Map.Entry<K, V> item : orderedMap) {
             if (item.getKey().compareTo(fromKey) >= 0
-                    || item.getKey().compareTo(toKey) <= 0) {
+                    && item.getKey().compareTo(toKey) <= 0) {
                 sub.put(item.getKey(), item.getValue());
             }
         }

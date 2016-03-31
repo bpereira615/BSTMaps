@@ -4,16 +4,24 @@ public class Test {
 		BSTMap<Integer, String> map = new BSTMap<Integer, String>();
 		map.put(7, "seven");
 		map.put(5, "five");
-		//map.put(55, "wjfwo");
-		/*map.put(16, "sixteen");
+		map.put(55, "wjfwo");
+		map.put(16, "sixteen");
 		map.put(15, "fifteen");
-		map.put(17, "seventeen");*/
+		map.put(17, "seventeen");
 		//map.put(77, "test");
-		map.test();
-		System.out.println("removed: " + map.remove(7));
-		map.put(null, "dowif");
+		//map.test();
+		//System.out.println("removed: " + map.remove(7));
+		//map.put(null, "dowif");
 		//map.test();
 		//System.out.println("removed: " + map.remove(5));
+
+
+		BSTMap<Integer, String> submap = map.subMap(4, 33);
+
+		System.out.println("all: " + map.keys());
+		System.out.println("keys: " + submap.keys());
+
+
 		/*
 		map.put(2, "test");
 
