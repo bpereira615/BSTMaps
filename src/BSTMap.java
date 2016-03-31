@@ -231,11 +231,12 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public V remove(K key) {
-        if (this.hasKey(key)) {
-            //increment size
-            this.size--;
+        if (!this.hasKey(key)) {
+            return null;
         }
         
+        //decrement size
+        this.size--;
         return this.remove(key, this.root);
     }
 
@@ -248,8 +249,6 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         //in order search for position
         int diff = key.compareTo(curr.key);
-
-        System.out.println("Difference: " + diff);
         
         if (curr.isLeaf() && diff != 0) {
 
@@ -264,32 +263,81 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
             return this.remove(key, curr.right);
         } else if (curr.left.key != null && curr.right.key != null) { //has two non-sentinel children
-
-
+                
             V val = curr.value;
-            
             K firstKey = this.firstKey(curr.right);
-            curr.value = this.get(firstKey);
+
+
+            System.out.println("iowjdjfwiodjfwijdfw");
+
+            //deleting root edge case
+            if (curr.key == this.root.key) {
+
+                root.value = this.get(firstKey);
+                
+                this.removeMin(curr.right);
+                
+                root.key = firstKey;
+
+            } else {
+                
+                curr.value = this.get(firstKey);
+                
+                this.removeMin(curr.right);
+                
+                curr.key = firstKey;
             
-            this.removeMin(curr.right);
-            
-            curr.key = firstKey;
+
+            }
             
             return val;
         } else { //has 0 or 1 non-sentinel children
 
             V val = curr.value;
-            if (curr.left.key != null) {
-                curr = curr.left;
-            } else if (curr.right.key != null) {
-                //if left and right are both null, curr becomes null here
-                curr = curr.right;
-            } else {
+            
 
-                System.out.println("PRINT HERE!");
-                curr.key = null;
-                curr.value = null;
+
+            //edge case deleting root
+            if (curr.key == this.root.key) {
+
+                if (root.left.key != null) {
+
+                    root = root.left;
+                } else if (root.right.key != null) {
+                    //if left and right are both null, curr becomes null here
+
+
+                    root = root.right;
+                } else {
+
+                    root.key = null;
+                    root.value = null;
+                }
+            } else {
+                if (curr.left.key != null) {
+
+                    curr = curr.left;
+                } else if (curr.right.key != null) {
+                    //if left and right are both null, curr becomes null here
+
+
+                    curr = curr.right;
+                } else {
+
+                    curr.key = null;
+                    curr.value = null;
+                }
             }
+            
+
+
+
+
+
+
+
+
+
             return val;
         }
 
@@ -301,7 +349,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
      */
     public BNode removeMin(BNode curr) {
         if (curr.left.isLeaf()) {
-            curr = null;
+            curr.key = null;
+            curr.value = null;
             return null;
         }
 
@@ -500,7 +549,16 @@ public class BSTMap<K extends Comparable<? super K>, V>
         Collection<Map.Entry<K, V>> test = this.inOrder(this.root);
         System.out.println(test);
 
-        System.out.println("first: " + this.firstKey(this.root));
-        System.out.println("last: " + this.lastKey(this.root));
+        //System.out.println("first: " + this.firstKey(this.root));
+        //System.out.println("last: " + this.lastKey(this.root));
+
+
+
+        //Test visual tree
+        System.out.println("root: " + this.root.key);
+        System.out.println("root.left: " + this.root.left.key);
+        System.out.println("root.right: " + this.root.right.key);
+        //System.out.println("root.right.left: " + this.root.right.left.key);
+        //System.out.println("root.right.right: " + this.root.right.right.key);
     }
 }

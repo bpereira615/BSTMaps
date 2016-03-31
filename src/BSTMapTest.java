@@ -309,7 +309,7 @@ public class BSTMapTest {
 
 
 
-/*
+
     @Test
     public void testRemoveAll() {
         int size = all.size();
@@ -337,7 +337,7 @@ public class BSTMapTest {
         assertEquals(0, all.size());
 
     }
-
+/*
     @Test
     public void testRemoveDuplicateValues() {
         for (int i=0; i < iray.length; i++) {
