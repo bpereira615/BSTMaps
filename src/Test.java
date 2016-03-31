@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class Test {
 	public static void main(String[] args) {
 		
@@ -15,11 +17,55 @@ public class Test {
 		//map.test();
 		//System.out.println("removed: " + map.remove(5));
 
+		/*
 
 		BSTMap<Integer, String> submap = map.subMap(4, 33);
 
 		System.out.println("all: " + map.keys());
 		System.out.println("keys: " + submap.keys());
+
+		*/
+
+
+
+		
+		Iterator<Map.Entry<Integer, String>> it = map.iterator();
+
+		System.out.println(it.hasNext());
+		//System.out.println(it.next().getKey());
+
+	
+		String s = "";
+		int i = 0;
+
+
+		while (it.hasNext()) { 
+			System.out.println(i);
+
+
+			s += it.next().getKey() + " ";
+
+			if (i == 1 || i == 3) {
+				it.remove();
+			}
+			i++;
+
+		}
+
+
+
+		System.out.println(map.keys());
+		it = map.iterator();
+		it.next();
+		it.remove();
+		it.next();
+		it.remove();
+				System.out.println(map.keys());
+
+	
+
+		//System.out.println("keys: " + s);
+		
 
 
 		/*
@@ -49,6 +95,6 @@ public class Test {
 		System.out.println(map.get(2));
 		System.out.println(map.hasValue("testd"));
 		*/
-		map.test();
+		//map.test();
 	}
 }

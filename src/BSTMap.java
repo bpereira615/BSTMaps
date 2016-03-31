@@ -473,7 +473,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override
     public Iterator<Map.Entry<K, V>> iterator() {
-        return null;
+        return new BSTMapIterator();
     }
 
     @Override
@@ -499,10 +499,12 @@ public class BSTMap<K extends Comparable<? super K>, V>
         /** Ordered ArrayList of keys to iterate on. */
         ArrayList<Map.Entry<K, V>> ordered;
         /** Current position in the ArrayList. */
-        int pos = 0;
+        int pos = -1;
         /** Number of operations applied to map at init,
          * used for state check when doing next or remove. */
         int operationsAtInit;
+
+        
 
         /**
          * Make a BSTMapIterator.
@@ -515,10 +517,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
         @Override
         public boolean hasNext() {
-            if (this.pos < this.ordered.size()) {
-                return true;
-            }
-            return false;
+            return this.pos < this.ordered.size() - 1;
         }
 
         @Override
@@ -527,17 +526,23 @@ public class BSTMap<K extends Comparable<? super K>, V>
             if (this.operationsAtInit != BSTMap.this.operations) {
                 throw new ConcurrentModificationException();
             }
+
             this.pos++;
             return this.ordered.get(this.pos);
         }
 
         @Override
         public void remove() {
+
             if (this.operationsAtInit != BSTMap.this.operations) {
                 throw new ConcurrentModificationException();
             }
             BSTMap.this.remove(this.ordered.get(this.pos).getKey());
+            this.ordered.remove(this.pos);
             this.operationsAtInit++;
+
+
+
         }
     }
 
