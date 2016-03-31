@@ -185,6 +185,11 @@ public class BSTMap<K extends Comparable<? super K>, V>
     @Override()
     public V put(K key, V val) {
 
+        //throw exception if key is null
+        if (key == null) {
+            throw new NullPointerException();
+        }
+
         if (!this.hasKey(key)) {
             //increment size
             this.size++;
@@ -231,6 +236,12 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public V remove(K key) {
+
+        //throw exception if key is null
+        if (key == null) {
+            throw new NullPointerException();
+        }
+
         if (!this.hasKey(key)) {
             return null;
         }

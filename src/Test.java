@@ -11,6 +11,7 @@ public class Test {
 		//map.put(77, "test");
 		map.test();
 		System.out.println("removed: " + map.remove(7));
+		map.put(null, "dowif");
 		//map.test();
 		//System.out.println("removed: " + map.remove(5));
 		/*
