@@ -312,7 +312,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
             
             //edge case deleting root
             if (curr.key == this.root.key) {
-                this.removeIncompleteSubTree(curr);
+                this.removeIncompleteSubTree(this.root);
             } else {
                 this.removeIncompleteSubTree(curr);
             }
