@@ -27,13 +27,13 @@ public class Test {
 		*/
 
 
-
 		
 		Iterator<Map.Entry<Integer, String>> it = map.iterator();
 
-		System.out.println(it.hasNext());
+
 		//System.out.println(it.next().getKey());
 
+/*
 	
 		String s = "";
 		int i = 0;
@@ -52,16 +52,27 @@ public class Test {
 
 		}
 
-
-
+*/
+/*
 		System.out.println(map.keys());
 		it = map.iterator();
 		it.next();
 		it.remove();
-		it.next();
-		it.remove();
-				System.out.println(map.keys());
 
+
+		System.out.println(map.keys());
+		*/
+
+		//it.remove();
+
+		//		System.out.println(map.keys());
+
+
+		
+		it = map.iterator();
+		System.out.println(map.remove(7));
+		it.next();
+	
 	
 
 		//System.out.println("keys: " + s);

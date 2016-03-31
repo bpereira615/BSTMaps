@@ -207,7 +207,6 @@ public class BSTMapTest {
 
 
 
-//TODO: edit for BST implementation
 
     @Test
     public void testPutCollections() {
@@ -284,7 +283,6 @@ public class BSTMapTest {
 
 
 
-//TODO: entries for BST implementation
 
     @Test
     public void testAfterAddAll() {
@@ -337,186 +335,7 @@ public class BSTMapTest {
         assertEquals(0, all.size());
 
     }
-/*
-    @Test
-    public void testRemoveDuplicateValues() {
-        for (int i=0; i < iray.length; i++) {
-            all.put(iray[i]+20,sray[i]);  // duplicate values allowed
-        }
-        int size = all.size();
-        assertTrue(size == iray.length*2);
-        int cap = all.getCapacity();
-        int ghosts = 0;
-        assertEquals(0, all.ghosts());  // no tombstones yet
-        Set<Integer> keys = all.keys();
-        Collection<String> vals = all.values();  // has duplicates
-        for (int i=0; i < iray.length; i++) {
-            assertEquals(all.remove(iray[i]), sray[i]); // returns val
-            size--;
-            ghosts++;
-            assertEquals(size, all.size());  // size decrease
-            assertEquals(ghosts, all.ghosts());  // ghost increase
-            assertTrue(all.size() >= all.ghosts());  // more active than inactive
-            assertNull(all.get(iray[i]));  // key not there now
-            assertFalse(all.hasKey(iray[i]));  // key gone
-            assertTrue(all.hasValue(sray[i]));  // val still there
-            assertTrue(all.hasKey(iray[i]+20)); // new key there
-            keys.remove(iray[i]);
-            vals.remove(sray[i]);  // only one copy removed
-            assertEquals(keys, all.keys());
-            assertTrue(sameCollection(vals, all.values()));
-        }
-        assertEquals(cap, all.getCapacity());  // don't resize even if rehash
-        assertTrue(.5f == all.getMaxLoad());   // never changes
-        assertTrue(all.size() == iray.length); // half the values there
-        assertTrue(all.size() == all.ghosts()); // removed half
-        assertTrue(all.getLoad() == (float) all.size() / cap);
-        for (int i=0; i < iray.length; i++) {
-            assertEquals(all.get(iray[i]+20),sray[i]); 
-        }
-    }
 
-
-    @Test
-    public void testIteratorFullRemove() {
-        // start with load factor 1 table
-        BSTMap<Integer, String> full = new BSTMap<Integer,String>(1.0f);
-        HashSet<LPMapEntry<Integer,String>> pairs = new HashSet<LPMapEntry<Integer,String>>();
-        int cap = 5;
-        // put 5 entries in to fill
-        int i=0;
-        for ( ; i < cap; i++) {
-            full.put(i, i+"");
-            pairs.add(new LPMapEntry<Integer,String>(i, i+""));
-        }
-        assertEquals(pairs, full.entries());
-        Iterator<LPMapEntry<Integer,String>> it = full.iterator();
-        int count = cap;
-        i = 0;
-        while (it.hasNext()) {
-            assertEquals(new LPMapEntry<Integer,String>(i, i+""), it.next());
-            it.remove();
-            count--;
-            pairs.remove(new LPMapEntry<Integer,String>(i, i+""));
-            assertEquals(count, full.size());
-            assertEquals(pairs, full.entries());
-            i++;
-        }
-        assertEquals("iterated through all elements", 0, count);
-        assertEquals("removed all entries with iterator", 0, full.size());
-        assertEquals(0, full.entries().size());
-        assertEquals(0, full.keys().size());
-        assertEquals(0, full.values().size());
-        // 5 entries removed, should all be tombstones
-        // we don't rehash when removing through iterator
-        it = full.iterator();
-        count = 0;
-        LPMapEntry<Integer, String> e;
-        while (it.hasNext()) {
-            e = it.next();
-            assertTrue(e.isTombstone());
-            count++;
-        }
-        assertEquals(cap, count);
-    }
-
-    @Test
-    public void testIteratorAllEntryTypes() {
-        // using load factor .7 table
-        HashSet<Integer> keys = new HashSet<Integer>();
-        ArrayList<String> vals = new ArrayList<String>();
-        LPMapEntry<Integer,String>[] entries = new LPMapEntry[iray.length];
-        HashSet<LPMapEntry<Integer,String>> pairs = new HashSet<LPMapEntry<Integer,String>>();
-        for (int i=0; i < iray.length; i++) {
-            assertNull(e7.put(iray[i],sray[i]));  // new key
-            keys.add(iray[i]);
-            vals.add(sray[i]);
-            entries[i] = new LPMapEntry<Integer,String>(iray[i],sray[i]);
-            pairs.add(new LPMapEntry<Integer,String>(iray[i],sray[i]));
-            assertEquals(keys, e7.keys());
-            assertTrue(sameCollection(e7.values(),vals));
-            assertEquals(pairs, e7.entries());
-        }
-        Iterator<LPMapEntry<Integer,String>> it = e7.iterator();
-        int cap = e7.getCapacity();
-        int size = e7.size();
-        assertTrue(size < cap);  // has empty slots at end
-        int count = 0;
-        LPMapEntry<Integer,String> e;
-        while (it.hasNext()) {
-            e = it.next();
-            if (count < size) {
-                assertEquals(entries[count],e);
-            }
-            if (count % 3 == 0) {  // only remove 1/3 of the entries, no rehash
-                if (e != null) {
-                    pairs.remove(e);  // before becomes tombstone
-                }
-                it.remove();  // ignore remove on empty slots
-                if (e != null) {
-                    keys.remove(e.getKey());
-                    vals.remove(e.getValue());
-                    entries[count].makeTombstone();
-                }
-            }
-            if (count > size) {
-                assertNull(e);   // iterates through empty slots
-            }
-            count++;
-        }
-        assertEquals(count, cap);  // iterated through all slots
-        assertEquals(keys, e7.keys());
-        assertTrue(sameCollection(vals, e7.values()));
-        assertEquals(pairs, e7.entries());
-
-        // now iterate through again to check for empties, ghosts and entries
-        // remove some ghosts
-        it = e7.iterator();
-        count = 0;
-        while (it.hasNext()) {
-            e = it.next();
-            if (count < size) {
-                assertEquals(entries[count],e);
-                if (count % 3 != 0) {
-                    assertEquals(new LPMapEntry<Integer,String>(iray[count],sray[count]),e);
-                } else { // (count % 3 == 0)  // these are now ghosts
-                    assertTrue(e.isTombstone());
-                    it.remove();  // test remove ghost does nothing
-                }
-            } else {
-                assertNull(e);   // iterates through empty slots
-            }
-            count++;
-        }
-        assertEquals(count, cap);  // iterated through all slots
-        assertEquals(keys, e7.keys());
-        assertTrue(sameCollection(vals, e7.values()));
-        assertEquals(pairs, e7.entries());
-
-        // one more time to check on ghost removal did nothing
-        it = e7.iterator();
-        count = 0;
-        while (it.hasNext()) {
-            e = it.next();
-            if (count < size) {
-                assertEquals(entries[count],e);
-                if (count % 3 != 0) {
-                    assertEquals(new LPMapEntry<Integer,String>(iray[count],sray[count]),e);
-                } else { // (count % 3 == 0)  // these are now ghosts
-                    assertTrue(e.isTombstone());
-                }
-            } else {
-                assertNull(e);   // iterates through empty slots
-            }
-            count++;
-        }
-        assertEquals(count, cap);  // iterated through all slots
-        assertEquals(keys, e7.keys());
-        assertTrue(sameCollection(vals, e7.values()));
-        assertEquals(pairs, e7.entries());
-    }
-
-    */
 
 
 }
