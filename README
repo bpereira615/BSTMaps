@@ -16,5 +16,7 @@ Files:
 	
 	BSTMap.java - implementation of the MapJHU.java ADT using binary
 	search tree
+	
+	BSTMapTest.java - edited JUnit test of 
 
 
