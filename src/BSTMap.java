@@ -309,14 +309,9 @@ public class BSTMap<K extends Comparable<? super K>, V>
         } else { //has 0 or 1 non-sentinel children
 
             V val = curr.value;
-            
-            //edge case deleting root
-            if (curr.key == this.root.key) {
-                this.removeIncompleteSubTree(this.root);
-            } else {
-                this.removeIncompleteSubTree(curr);
-            }
-            
+
+            this.removeIncompleteSubTree(curr);
+
             return val;
         }
 
@@ -326,14 +321,27 @@ public class BSTMap<K extends Comparable<? super K>, V>
      * @param curr the BNode to remove
      */
     public void removeIncompleteSubTree(BNode curr) {
-        if (curr.left.key != null) {
-            curr = curr.left;
-        } else if (curr.right.key != null) {
-            //if left and right are both null, curr becomes null here
-            curr = curr.right;
+       //edge case deleting root
+        if (curr.key == this.root.key) {
+            if (this.root.left.key != null) {
+                this.root = this.root.left;
+            } else if (this.root.right.key != null) {
+                //if left and right are both null, curr becomes null here
+                this.root = this.root.right;
+            } else {
+                this.root.key = null;
+                this.root.value = null;
+            }
         } else {
-            curr.key = null;
-            curr.value = null;
+            if (curr.left.key != null) {
+                curr = curr.left;
+            } else if (curr.right.key != null) {
+                //if left and right are both null, curr becomes null here
+                curr = curr.right;
+            } else {
+                curr.key = null;
+                curr.value = null;
+            }
         }
     }
     
