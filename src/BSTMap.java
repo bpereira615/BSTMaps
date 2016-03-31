@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 //inOrder Map.Entry collection
 import java.util.AbstractMap;
-
+import java.util.ArrayList;
 //entries and values sets
 import java.util.HashSet;
 
@@ -75,6 +75,9 @@ public class BSTMap<K extends Comparable<? super K>, V>
     private BNode root;
     /** The number of entries in this map (== non-sentinel nodes). */
     private int size;
+    /** Keeps track of state for iterator, incremented
+     * when put or remove is called. */
+    private int operations;
 
     /** Create an empty tree with a sentinel root node.
      */
@@ -91,8 +94,6 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public void clear() {
-
-        //TODO: reuse constructor?
         this.root = new BNode(null, null);
         this.size = 0; 
     }
@@ -194,7 +195,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
             //increment size
             this.size++;
         }
-
+        
+        this.operations++;
         return this.put(key, val, this.root);
     }
 
@@ -213,7 +215,6 @@ public class BSTMap<K extends Comparable<? super K>, V>
             curr.left = new BNode(null, null);
             curr.right = new BNode(null, null);
 
-            //TODO: return null for new nodes?
             return null;
         }
 
@@ -248,6 +249,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
         //decrement size
         this.size--;
+        this.operations++;
         return this.remove(key, this.root);
     }
 
@@ -270,25 +272,27 @@ public class BSTMap<K extends Comparable<? super K>, V>
         if (diff < 0) {
             
             return this.remove(key, curr.left);
-        } else if (diff > 0){ //if key is larger than root key, search right subtree
-
+            
+        } else if (diff > 0) {
+            
+            //if key is larger than root key, search right subtree
             return this.remove(key, curr.right);
-        } else if (curr.left.key != null && curr.right.key != null) { //has two non-sentinel children
+            
+        } else if (curr.left.key != null && curr.right.key != null) {
+            
+            //has two non-sentinel children
                 
             V val = curr.value;
             K firstKey = this.firstKey(curr.right);
 
-
-            System.out.println("iowjdjfwiodjfwijdfw");
-
             //deleting root edge case
             if (curr.key == this.root.key) {
 
-                root.value = this.get(firstKey);
+                this.root.value = this.get(firstKey);
                 
                 this.removeMin(curr.right);
                 
-                root.key = firstKey;
+                this.root.key = firstKey;
 
             } else {
                 
@@ -297,58 +301,38 @@ public class BSTMap<K extends Comparable<? super K>, V>
                 this.removeMin(curr.right);
                 
                 curr.key = firstKey;
-            
 
             }
             
             return val;
+            
         } else { //has 0 or 1 non-sentinel children
 
             V val = curr.value;
             
-
-
             //edge case deleting root
             if (curr.key == this.root.key) {
-
-                if (root.left.key != null) {
-
-                    root = root.left;
-                } else if (root.right.key != null) {
+                if (this.root.left.key != null) {
+                    this.root = this.root.left;
+                } else if (this.root.right.key != null) {
                     //if left and right are both null, curr becomes null here
-
-
-                    root = root.right;
+                    this.root = this.root.right;
                 } else {
-
-                    root.key = null;
-                    root.value = null;
+                    this.root.key = null;
+                    this.root.value = null;
                 }
             } else {
                 if (curr.left.key != null) {
-
                     curr = curr.left;
                 } else if (curr.right.key != null) {
                     //if left and right are both null, curr becomes null here
-
-
                     curr = curr.right;
                 } else {
-
                     curr.key = null;
                     curr.value = null;
                 }
             }
             
-
-
-
-
-
-
-
-
-
             return val;
         }
 
