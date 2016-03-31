@@ -457,44 +457,25 @@ public class BSTMap<K extends Comparable<? super K>, V>
         return ordered;
     }
 
-    /** Returns a copy of the portion of this map whose keys are in a range.
+        /** Returns a copy of the portion of this map whose keys are in a range.
      *  @param fromKey the starting key of the range, inclusive if found
      *  @param toKey the ending key of the range, inclusive if found
      *  @return the resulting submap
      */
     public BSTMap<K, V> subMap(K fromKey, K toKey) {
         
-//        BSTMap<K, V> sub = this;
-//        
-//        BNode curr = sub.root;
-//        while(curr.key.compareTo(fromKey) >= 0) {
-//            curr = curr.left;
-//        }
-//        curr.left = null;
-//        
-//        //remove node after upper bound (and its children too)
-//        curr = root;
-//        while(curr.key.compareTo(fromKey) <= 0) {
-//            curr = curr.right;
-//        }
-//        curr.right = null;
-//        
-//        return sub;
+        BSTMap<K, V> sub = new BSTMap<K, V>();
         
-        BSTMap<K,V> sub = new BSTMap<K,V>();
-        
-        Collection<Map.Entry<K, V>> orderedMap = (Collection<Entry<K, V>>) this.inOrder();
+        Collection<Map.Entry<K, V>> orderedMap =
+                (Collection<Entry<K, V>>) this.inOrder();
         
         for (Map.Entry<K, V> item : orderedMap) {
-            if (item.getKey().compareTo(fromKey) >= 0 || item.getKey().compareTo(toKey) <= 0) {
+            if (item.getKey().compareTo(fromKey) >= 0
+                    || item.getKey().compareTo(toKey) <= 0) {
                 sub.put(item.getKey(), item.getValue());
             }
         }
         return sub;
-    }
-    
-    public void getValidNodes(K fromKey, K toKey, BNode curr, BSTMap<K,V> sub) {
-        
     }
 
     /* ---------- from Iterable ---------- */
@@ -517,41 +498,57 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     /* -----  insert the BSTMapIterator inner class here ----- */
 
-//    /**
-//     * Inner BSTMapIterator class for convenience.
-//     * Note that the generic type is implied since we are within DLList<T>.
-//     */
-//    public class BSTMapIterator implements Iterator<BSTMap<K, V>> {
-//
-//        Iterable<Map.Entry<K, V>> ordered;
-//
-//        /**
-//         * Make a BSTMapIterator.
-//         */
-//        public BSTMapIterator() {
-//            this.ordered = BSTMap.this.inOrder();
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//            return false;
-//        }
-//
-//        @Override
-//        public BNode<K, V> next() {
-//            //check if map has been changed
-//            if (this.ordered != BSTMap.this.inOrder()) {
-//                throw new ConcurrentModificationException();
-//            }
-//            
-//            return BSTMap.this.get(key);
-//        }
-//
-//        @Override
-//        public void remove() {
-//            
-//        }
-//    }
+    /**
+     * Inner BSTMapIterator class for convenience.
+     * Note that the generic type is implied since we are
+     * within Map.Entry<K, V>.
+     */
+    public class BSTMapIterator implements Iterator<Map.Entry<K, V>> {
+
+        /** Ordered ArrayList of keys to iterate on. */
+        ArrayList<Map.Entry<K, V>> ordered;
+        /** Current position in the ArrayList. */
+        int pos = 0;
+        /** Number of operations applied to map at init,
+         * used for state check when doing next or remove. */
+        int operationsAtInit;
+
+        /**
+         * Make a BSTMapIterator.
+         */
+        public BSTMapIterator() {
+            this.ordered = (new ArrayList<Map.Entry<K, V>>(
+                    (Collection<Map.Entry<K, V>>) BSTMap.this.inOrder()));
+            this.operationsAtInit = BSTMap.this.operations;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (this.pos < this.ordered.size()) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public Map.Entry<K, V> next() {
+            //check if map has been changed
+            if (this.operationsAtInit != BSTMap.this.operations) {
+                throw new ConcurrentModificationException();
+            }
+            this.pos++;
+            return this.ordered.get(this.pos);
+        }
+
+        @Override
+        public void remove() {
+            if (this.operationsAtInit != BSTMap.this.operations) {
+                throw new ConcurrentModificationException();
+            }
+            BSTMap.this.remove(this.ordered.get(this.pos).getKey());
+            this.operationsAtInit++;
+        }
+    }
 
     /**
      * Simple test to check various functions.
