@@ -1,3 +1,19 @@
+/********************************************************************
+ * Benjamin Hoertnagl-Pereira 
+ * JHED: bhoertn1 
+ * 631-488-7197 
+ * bhoertn1@jhu.edu
+ * 
+ * Ryan Demo
+ * JHED: rdemo1
+ * rdemo1@jhu.edu
+ *
+ * 600.226.02 | CS226 Data Structures | Section 2
+ * Project 3, Part A - Binary Search Tree
+ *
+ *******************************************************************/
+
+
 /** TESTS for 600.226 Spring 2016 Project 2 - BSTMap implementation
  *  Explicit tests for metrics after inserting and insert caused rehashing
  *  Explicit tests for contents and lookup after inserting, with duplicate vals

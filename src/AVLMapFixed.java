@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
+
 //inOrder Map.Entry collection
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -35,32 +36,44 @@ import java.util.HashSet;
  *  @param <K> the base type of the keys in the entries
  *  @param <V> the base type of the values
  */
-public class BSTMap<K extends Comparable<? super K>, V>
+public class AVLMapFixed<K extends Comparable<? super K>, V>
     implements MapJHU<K, V>, Iterable<Map.Entry<K, V>> {
 
     /** Inner node class.  Do not make this static because you want
-        the K to be the same K as in the BSTMap header.
+        the K to be the same K as in the AVLMapFixed header.
     */
-    protected class BNode {
+    protected class AVLNode {
 
         /** The key of the entry (null if sentinel node). */
         protected K key;
         /** The value of the entry (null if sentinel node). */
         protected V value;
         /** The left child of this node. */
-        protected BNode left;
+        protected AVLNode left;
         /** The right child of this node. */
-        protected BNode right;
-
+        protected AVLNode right;
+        
+        /** The height of a node. */
+        private int height;
+        
         /** Create a new node with a particular key and value.
-         *  @param k the key for the new node
-         *  @param v the value for the new node
+         *  @param key the key for the new node
+         *  @param val the value for the new node
          */
-        BNode(K k, V v) {
+        AVLNode(K k, V v) {
             this.key = k;
             this.value = v;
             this.left = null;
             this.right = null;
+            this.height = -1;
+        }
+        
+        /** Evaluate balance factor of the node by comparing
+         * the height of its children, left - right.
+         * @return balance factor
+         */
+        public int bf() {
+            return this.left.height - this.right.height;
         }
 
         /** Check whether this node is a leaf sentinel, based on key.
@@ -72,7 +85,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
     }
 
     /** The root of this tree. */
-    protected BNode root;
+    protected AVLNode root;
     /** The number of entries in this map (== non-sentinel nodes). */
     protected int size;
     /** Keeps track of state for iterator, incremented
@@ -81,9 +94,9 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     /** Create an empty tree with a sentinel root node.
      */
-    public BSTMap() {
+    public AVLMapFixed() {
         // empty tree is a sentinel for the root
-        this.root = new BNode(null, null);
+        this.root = new AVLNode(null, null);
         this.size = 0;
     }
 
@@ -94,7 +107,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override()
     public void clear() {
-        this.root = new BNode(null, null);
+        this.root = new AVLNode(null, null);
         this.size = 0; 
     }
 
@@ -118,7 +131,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @param curr the root of the subtree being searched
      *  @return true if found, false otherwise
      */
-    public boolean hasKey(K key, BNode curr) {
+    public boolean hasKey(K key, AVLNode curr) {
 
         //reached end, not found (base case)
         if (curr.isLeaf()) {
@@ -161,7 +174,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @param curr the root of the subtree from which to get the entry
      *  @return the value associated with the key, or null if not found
      */
-    public V get(K key, BNode curr) {
+    public V get(K key, AVLNode curr) {
         //run hasKey operation to find node associated with key, 
         //then return value
 
@@ -197,8 +210,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
         }
         
         this.operations++;
-
-        return this.put(key, val, this.root);
+        
+        return this.put(key, val, (AVLNode) this.root);
     }
 
     /** Put <key,value> entry into subtree with given root node.
@@ -207,36 +220,46 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @param curr the root of the subtree into which to put the entry
      *  @return the original value associated with the key, or null if not found
      */
-    private V put(K key, V val, BNode curr) {
-
-        if (curr.isLeaf()) {
-            //in correct position, insert node
-            curr.key = key;
-            curr.value = val;
-            curr.left = new BNode(null, null);
-            curr.right = new BNode(null, null);
-
-            return null;
-        }
-
-        //in order search for position
-        int diff = key.compareTo(curr.key);
+    private V put(K key, V val, AVLNode curr) {
         
-        //if key is smaller than root key, search left subtree
-        if (diff < 0) {
-            return this.put(key, val, curr.left);
-        } else if (diff == 0) { //node found with key, update and return old
-            V oldVal = curr.value;
-            curr.key = key;
-            curr.value = val;
-            return oldVal;
-        } else { //if key is larger than root key, search right subtree
-            return this.put(key, val,  curr.right);
-        }
+            if (curr.isLeaf()) {
+                //in correct position, insert node
+                curr.key = key;
+                curr.value = val;
+                curr.left = new AVLNode(null, null);
+                curr.right = new AVLNode(null, null);
+                curr.height = 0;
+                return null;
+            }
 
+            //in order search for position
+            int diff = key.compareTo(curr.key);
+            
+            //if key is smaller than root key, search left subtree
+            if (diff < 0) {
+                V value = this.put(key, val, curr.left);
+                curr.height++;
+                this.rebalance(curr);
+                return value;
+            } else if (diff == 0) { //node found with key, update and return old
+                V oldVal = curr.value;
+                curr.key = key;
+                curr.value = val;
+                this.rebalance(curr);
+                return oldVal;
+            } else { //if key is larger than root key, search right subtree
+                V value = this.put(key, val, curr.right);
+                curr.height++;
+                this.rebalance(curr);
+                return value;
+            }
+        
     }
-
-    @Override()
+    
+    /** Remove the entry associated with a key.
+     *  @param key the key for the entry being deleted
+     *  @return the value associated with the key, or null if key not there
+     */
     public V remove(K key) {
 
         //throw exception if key is null
@@ -251,7 +274,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
         //decrement size
         this.size--;
         this.operations++;
-        return this.remove(key, this.root);
+        return this.remove(key, (AVLNode) this.root);
     }
 
     /** Remove entry with specified key from subtree with given root node.
@@ -259,8 +282,8 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @param curr the root of the subtree from which to remove the entry
      *  @return the value associated with the removed key, or null if not found
      */
-    private V remove(K key, BNode curr) {
-        
+    public V remove(K key, AVLNode curr) {
+
         //in order search for position
         int diff = key.compareTo(curr.key);
         
@@ -317,10 +340,82 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     }
     
-    /** Handles remove case where the node has 0 or 1 non-sentinel children.
-     * @param curr the BNode to remove
+    /** Rebalances tree by checking left and right heaviness of
+     * the root and its left and right subtrees.
+     * @param root the root of subtree to balance
+     * @return balanced subtree root AVLNode
      */
-    public void removeIncompleteSubTree(BNode curr) {
+    public AVLNode rebalance(AVLNode root) {
+        
+        //check if tree is right heavy
+        if (root.bf() < -1) {
+            if (root.right.bf() > 1) {
+                //if root's right subtree is left heavy
+                return doubleLR(root);
+            } else {
+                //root's right subtree is not left heavy
+                return singleLeft(root);
+            }
+        } else if (root.bf() > 1) { //root is left heavy
+            if (root.left.bf() < -1) {
+                //root's left subtree is right heavy
+                return doubleRL(root);
+            } else {
+                //root's left subtree is not right heavy
+                return singleRight(root);
+            }
+        }
+        
+        //if tree is balanced return itself
+        return root;
+        
+    }
+    
+    /** Perform left rotation on an AVLNode.
+     * @param curr AVLNode to left rotate
+     * @return left rotated AVLNode
+     */
+    public AVLNode singleLeft(AVLNode curr) {
+        AVLNode root = curr.right;
+        curr.right = root.left;
+        root.left = curr;
+        return root;
+    }
+    
+    /** Perform right rotation on an AVLNode.
+     * @param curr AVLNode to right rotate
+     * @return right rotated AVLNode
+     */
+    public AVLNode singleRight(AVLNode curr) {
+        AVLNode root = curr.left;
+        curr.left = root.right;
+        root.right = curr;
+        return root;
+    }
+
+    /** Perform double left (left-right) rotation on an AVLNode.
+     * @param curr AVLNode to double left rotate
+     * @return left-right rotated AVLNode
+     */
+    public AVLNode doubleLR(AVLNode curr) {
+        curr.right = singleRight(curr.right);
+        return singleLeft(curr);
+    }
+    
+    /** Perform double right (right-left) rotation on an AVLNode.
+     * @param curr AVLNode to double right rotate
+     * @return right-left rotated AVLNode
+     */
+    public AVLNode doubleRL(AVLNode curr) {
+        curr.left = singleLeft(curr.left);
+        return singleRight(curr);
+    }
+    
+    
+    /** Handles remove case where the node has 0 or 1 non-sentinel children.
+     * @param curr the AVLNode to remove
+     */
+    public void removeIncompleteSubTree(AVLNode curr) {
        //edge case deleting root
         if (curr.key == this.root.key) {
             if (this.root.left.key != null) {
@@ -347,9 +442,9 @@ public class BSTMap<K extends Comparable<? super K>, V>
     
     /** Search subtree recursively and remove its smallest value.
      * @param curr the subtree
-     * @return BNode with the min key
+     * @return AVLNode with the min key
      */
-    public BNode removeMin(BNode curr) {
+    public AVLNode removeMin(AVLNode curr) {
         if (curr.left.isLeaf()) {
             curr.key = null;
             curr.value = null;
@@ -390,13 +485,13 @@ public class BSTMap<K extends Comparable<? super K>, V>
         return values;
     }
 
-    /* -----   BSTMap-specific functions   ----- */
+    /* -----   AVLMapFixed-specific functions   ----- */
 
     /** Get the smallest key in a subtree.
      *  @param curr the root of the subtree to search
      *  @return the min key
      */
-    public K firstKey(BNode curr) {
+    public K firstKey(AVLNode curr) {
         if (curr.left.isLeaf()) {
             return curr.key;
         }
@@ -408,7 +503,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @param curr the root of the subtree to search
      *  @return the max key
      */
-    public K lastKey(BNode curr) {
+    public K lastKey(AVLNode curr) {
         if (curr.right.isLeaf()) {
             return curr.key;
         }
@@ -427,7 +522,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @param curr the root of the subtree to iterate over
      *  @return an iterable list of entries ordered by keys
      */
-    private Collection<Map.Entry<K, V>> inOrder(BNode curr) {
+    private Collection<Map.Entry<K, V>> inOrder(AVLNode curr) {
         LinkedList<Map.Entry<K, V>> ordered = new LinkedList<Map.Entry<K, V>>();
 
         if (curr.isLeaf()) {
@@ -453,9 +548,9 @@ public class BSTMap<K extends Comparable<? super K>, V>
      *  @param toKey the ending key of the range, inclusive if found
      *  @return the resulting submap
      */
-    public BSTMap<K, V> subMap(K fromKey, K toKey) {
+    public AVLMapFixed<K, V> subMap(K fromKey, K toKey) {
         
-        BSTMap<K, V> sub = new BSTMap<K, V>();
+        AVLMapFixed<K, V> sub = new AVLMapFixed<K, V>();
         
         Collection<Map.Entry<K, V>> orderedMap =
                 (Collection<Entry<K, V>>) this.inOrder();
@@ -473,7 +568,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
 
     @Override
     public Iterator<Map.Entry<K, V>> iterator() {
-        return new BSTMapIterator();
+        return new AVLMapFixedIterator();
     }
 
     @Override
@@ -487,14 +582,14 @@ public class BSTMap<K extends Comparable<? super K>, V>
         return null;
     }
 
-    /* -----  insert the BSTMapIterator inner class here ----- */
+    /* -----  insert the AVLMapFixedIterator inner class here ----- */
 
     /**
-     * Inner BSTMapIterator class for convenience.
+     * Inner AVLMapFixedIterator class for convenience.
      * Note that the generic type is implied since we are
      * within Map.Entry<K, V>.
      */
-    public class BSTMapIterator implements Iterator<Map.Entry<K, V>> {
+    public class AVLMapFixedIterator implements Iterator<Map.Entry<K, V>> {
 
         /** Ordered ArrayList of keys to iterate on. */
         ArrayList<Map.Entry<K, V>> ordered;
@@ -509,12 +604,12 @@ public class BSTMap<K extends Comparable<? super K>, V>
         
 
         /**
-         * Make a BSTMapIterator.
+         * Make a AVLMapFixedIterator.
          */
-        public BSTMapIterator() {
+        public AVLMapFixedIterator() {
             this.ordered = (new ArrayList<Map.Entry<K, V>>(
-                    (Collection<Map.Entry<K, V>>) BSTMap.this.inOrder()));
-            this.operationsAtInit = BSTMap.this.operations;
+                    (Collection<Map.Entry<K, V>>) AVLMapFixed.this.inOrder()));
+            this.operationsAtInit = AVLMapFixed.this.operations;
             this.justRemoved = false;
         }
 
@@ -526,7 +621,7 @@ public class BSTMap<K extends Comparable<? super K>, V>
         @Override
         public Map.Entry<K, V> next() {
             //check if map has been changed
-            if (this.operationsAtInit != BSTMap.this.operations) {
+            if (this.operationsAtInit != AVLMapFixed.this.operations) {
                 throw new ConcurrentModificationException();
             }
             this.justRemoved = false;
@@ -538,10 +633,10 @@ public class BSTMap<K extends Comparable<? super K>, V>
         public void remove() {
             
             if (!this.justRemoved) {
-                if (this.operationsAtInit != BSTMap.this.operations) {
+                if (this.operationsAtInit != AVLMapFixed.this.operations) {
                     throw new ConcurrentModificationException();
                 }
-                BSTMap.this.remove(this.ordered.get(this.pos).getKey());
+                AVLMapFixed.this.remove(this.ordered.get(this.pos).getKey());
                 this.ordered.remove(this.pos);
                 this.operationsAtInit++; 
                 this.justRemoved = true;
@@ -550,5 +645,27 @@ public class BSTMap<K extends Comparable<? super K>, V>
             }
             
         }
+    }
+    
+    public static void main(String[] args) {
+        AVLMapFixed<Integer, String> myBeautifulMap = new AVLMapFixed<Integer, String>();
+        myBeautifulMap.put(2, "k");
+        System.out.println("2: " + myBeautifulMap.get(2));
+        myBeautifulMap.put(1, "k");
+        myBeautifulMap.put(5, "k");
+        myBeautifulMap.put(4, "k");
+        myBeautifulMap.put(3, "k");
+        
+        System.out.println("2: " + myBeautifulMap.get(2));
+        System.out.println("1: " + myBeautifulMap.get(1));
+        System.out.println("5: " + myBeautifulMap.get(5));
+        System.out.println("4: " + myBeautifulMap.get(4));
+        System.out.println("3: " + myBeautifulMap.get(3));
+        System.out.println("root: " + myBeautifulMap.root.key);
+        System.out.println("root left: " + myBeautifulMap.root.left.key);
+        System.out.println("root right: " + myBeautifulMap.root.right.key);
+        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+        System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
+        
     }
 }
