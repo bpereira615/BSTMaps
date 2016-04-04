@@ -228,7 +228,7 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
                 curr.value = val;
                 curr.left = new AVLNode(null, null);
                 curr.right = new AVLNode(null, null);
-                curr.height = 0;
+                curr.height = determineNewHeight(curr);
                 return null;
             }
 
@@ -238,22 +238,30 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
             //if key is smaller than root key, search left subtree
             if (diff < 0) {
                 V value = this.put(key, val, curr.left);
-                curr.height++;
-                this.rebalance(curr);
+                // curr = this.rebalance(curr);
+                AVLNode newNode = this.rebalance(curr);
+                curr.left = newNode.left;
+                curr.right = newNode.right;
+                curr.key = newNode.key;
+                curr.value = newNode.value;
+                curr.height = determineNewHeight(curr);
                 return value;
             } else if (diff == 0) { //node found with key, update and return old
                 V oldVal = curr.value;
                 curr.key = key;
                 curr.value = val;
-                this.rebalance(curr);
                 return oldVal;
             } else { //if key is larger than root key, search right subtree
                 V value = this.put(key, val, curr.right);
-                curr.height++;
-                this.rebalance(curr);
+                // curr = this.rebalance(curr);
+                AVLNode newNode = this.rebalance(curr);
+                curr.left = newNode.left;
+                curr.right = newNode.right;
+                curr.key = newNode.key;
+                curr.value = newNode.value;
+                curr.height = determineNewHeight(curr);
                 return value;
             }
-        
     }
     
     /** Remove the entry associated with a key.
@@ -351,17 +359,21 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
         if (root.bf() < -1) {
             if (root.right.bf() > 1) {
                 //if root's right subtree is left heavy
+                System.out.println("doubleLR");
                 return doubleLR(root);
             } else {
                 //root's right subtree is not left heavy
+                System.out.println("singleLeft");
                 return singleLeft(root);
             }
         } else if (root.bf() > 1) { //root is left heavy
             if (root.left.bf() < -1) {
+                System.out.println("doubleRL");
                 //root's left subtree is right heavy
                 return doubleRL(root);
             } else {
                 //root's left subtree is not right heavy
+                System.out.println("singleRight");
                 return singleRight(root);
             }
         }
@@ -377,8 +389,11 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
      */
     public AVLNode singleLeft(AVLNode curr) {
         AVLNode root = curr.right;
+        AVLNode replacement = new AVLNode(curr.key, curr.value);
         curr.right = root.left;
-        root.left = curr;
+        root.left = replacement;
+        curr.height = determineNewHeight(curr);
+        root.height = determineNewHeight(root);
         return root;
     }
     
@@ -388,10 +403,38 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
      */
     public AVLNode singleRight(AVLNode curr) {
         AVLNode root = curr.left;
+        AVLNode replacement = new AVLNode(curr.key, curr.value);
         curr.left = root.right;
-        root.right = curr;
+        root.right = replacement;
+        curr.height = determineNewHeight(curr);
+        root.height = determineNewHeight(root);
         return root;
     }
+
+    // /** Perform left rotation on an AVLNode.
+    //  * @param curr AVLNode to left rotate
+    //  * @return left rotated AVLNode
+    //  */
+    // public AVLNode singleRight(AVLNode curr) {
+    //     AVLNode newRight = curr;
+    //     AVLNode newRoot =   
+    //     curr.height = determineNewHeight(curr);
+    //     root.height = determineNewHeight(root);
+    //     return root;
+    // }
+    
+    // * Perform right rotation on an AVLNode.
+    //  * @param curr AVLNode to right rotate
+    //  * @return right rotated AVLNode
+     
+    // public AVLNode singleLeft(AVLNode curr) {
+    //     AVLNode root = curr.left;
+    //     curr.left = root.right;
+    //     root.right = curr;
+    //     curr.height = determineNewHeight(curr);
+    //     root.height = determineNewHeight(root);
+    //     return root;
+    // }
 
     /** Perform double left (left-right) rotation on an AVLNode.
      * @param curr AVLNode to double left rotate
@@ -409,6 +452,12 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
     public AVLNode doubleRL(AVLNode curr) {
         curr.left = singleLeft(curr.left);
         return singleRight(curr);
+    }
+
+    private int determineNewHeight(AVLNode curr) {
+        int noo = Math.max(curr.left.height, curr.right.height) + 1;
+        System.out.printf("%s: %d\n",curr.key,noo);
+        return noo;
     }
     
     
@@ -649,23 +698,45 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
     
     public static void main(String[] args) {
         AVLMapFixed<Integer, String> myBeautifulMap = new AVLMapFixed<Integer, String>();
+        System.out.println("Left -------------");
         myBeautifulMap.put(2, "k");
-        System.out.println("2: " + myBeautifulMap.get(2));
+        System.out.println("inserted 2");
         myBeautifulMap.put(1, "k");
+        System.out.println("inserted 1");
         myBeautifulMap.put(5, "k");
+        System.out.println("inserted 5");
         myBeautifulMap.put(4, "k");
+        System.out.println("inserted 4");
         myBeautifulMap.put(3, "k");
+        System.out.println("inserted 3");
         
-        System.out.println("2: " + myBeautifulMap.get(2));
-        System.out.println("1: " + myBeautifulMap.get(1));
-        System.out.println("5: " + myBeautifulMap.get(5));
-        System.out.println("4: " + myBeautifulMap.get(4));
-        System.out.println("3: " + myBeautifulMap.get(3));
+        // // // System.out.println("2: " + myBeautifulMap.get(2));
+        // // // System.out.println("1: " + myBeautifulMap.get(1));
+        // // // System.out.println("5: " + myBeautifulMap.get(5));
+        // // // System.out.println("4: " + myBeautifulMap.get(4));
+        // // // System.out.println("3: " + myBeautifulMap.get(3));
         System.out.println("root: " + myBeautifulMap.root.key);
         System.out.println("root left: " + myBeautifulMap.root.left.key);
         System.out.println("root right: " + myBeautifulMap.root.right.key);
         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-        
+
+        myBeautifulMap = new AVLMapFixed<Integer, String>();
+        System.out.println("Right -------------");
+        myBeautifulMap.put(4, "k");
+        System.out.println("inserted 4");
+        myBeautifulMap.put(3, "k");
+        System.out.println("inserted 3");
+        myBeautifulMap.put(5, "k");
+        System.out.println("inserted 5");
+        myBeautifulMap.put(6, "k");
+        System.out.println("inserted 6");
+        myBeautifulMap.put(7, "k");
+        System.out.println("inserted 7");
+        System.out.println("root: " + myBeautifulMap.root.key);
+        System.out.println("root left: " + myBeautifulMap.root.left.key);
+        System.out.println("root right: " + myBeautifulMap.root.right.key);
+        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+        System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
     }
 }
