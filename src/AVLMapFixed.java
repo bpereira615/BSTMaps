@@ -245,6 +245,7 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
                 curr.key = newNode.key;
                 curr.value = newNode.value;
                 curr.height = determineNewHeight(curr);
+                this.root = this.rebalance(root);
                 return value;
             } else if (diff == 0) { //node found with key, update and return old
                 V oldVal = curr.value;
@@ -260,6 +261,7 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
                 curr.key = newNode.key;
                 curr.value = newNode.value;
                 curr.height = determineNewHeight(curr);
+                this.root = this.rebalance(root);
                 return value;
             }
     }
@@ -390,6 +392,17 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
     public AVLNode singleLeft(AVLNode curr) {
         AVLNode root = curr.right;
         AVLNode replacement = new AVLNode(curr.key, curr.value);
+        replacement.left = curr.left;
+        replacement.right = root.left;
+
+
+
+        // AVLNode a = new AVLNode(root.key, root.value);
+        // a.left = root.left;
+        // a.right = root.right;
+
+        // replacement.right = a;
+
         curr.right = root.left;
         root.left = replacement;
         curr.height = determineNewHeight(curr);
@@ -404,6 +417,9 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
     public AVLNode singleRight(AVLNode curr) {
         AVLNode root = curr.left;
         AVLNode replacement = new AVLNode(curr.key, curr.value);
+        replacement.left = root.right;
+        replacement.right = curr.right;
+
         curr.left = root.right;
         root.right = replacement;
         curr.height = determineNewHeight(curr);
@@ -698,45 +714,88 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
     
     public static void main(String[] args) {
         AVLMapFixed<Integer, String> myBeautifulMap = new AVLMapFixed<Integer, String>();
-        System.out.println("Left -------------");
-        myBeautifulMap.put(2, "k");
-        System.out.println("inserted 2");
-        myBeautifulMap.put(1, "k");
-        System.out.println("inserted 1");
-        myBeautifulMap.put(5, "k");
-        System.out.println("inserted 5");
-        myBeautifulMap.put(4, "k");
-        System.out.println("inserted 4");
-        myBeautifulMap.put(3, "k");
-        System.out.println("inserted 3");
+        // System.out.println("Left -------------");
+        // myBeautifulMap.put(2, "k");
+        // System.out.println("inserted 2");
+        // myBeautifulMap.put(1, "k");
+        // System.out.println("inserted 1");
+        // myBeautifulMap.put(5, "k");
+        // System.out.println("inserted 5");
+        // myBeautifulMap.put(4, "k");
+        // System.out.println("inserted 4");
+        // myBeautifulMap.put(3, "k");
+        // System.out.println("inserted 3");
         
-        // // // System.out.println("2: " + myBeautifulMap.get(2));
-        // // // System.out.println("1: " + myBeautifulMap.get(1));
-        // // // System.out.println("5: " + myBeautifulMap.get(5));
-        // // // System.out.println("4: " + myBeautifulMap.get(4));
-        // // // System.out.println("3: " + myBeautifulMap.get(3));
-        System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-        System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
+        // // // // System.out.println("2: " + myBeautifulMap.get(2));
+        // // // // System.out.println("1: " + myBeautifulMap.get(1));
+        // // // // System.out.println("5: " + myBeautifulMap.get(5));
+        // // // // System.out.println("4: " + myBeautifulMap.get(4));
+        // // // // System.out.println("3: " + myBeautifulMap.get(3));
+        // System.out.println("root: " + myBeautifulMap.root.key);
+        // System.out.println("root left: " + myBeautifulMap.root.left.key);
+        // System.out.println("root right: " + myBeautifulMap.root.right.key);
+        // System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+        // System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
+
+        // myBeautifulMap = new AVLMapFixed<Integer, String>();
+        // System.out.println("Right -------------");
+        // myBeautifulMap.put(4, "k");
+        // System.out.println("inserted 4");
+        // myBeautifulMap.put(3, "k");
+        // System.out.println("inserted 3");
+        // myBeautifulMap.put(5, "k");
+        // System.out.println("inserted 5");
+        // myBeautifulMap.put(6, "k");
+        // System.out.println("inserted 6");
+        // myBeautifulMap.put(7, "k");
+        // System.out.println("inserted 7");
+        // System.out.println("root: " + myBeautifulMap.root.key);
+        // System.out.println("root left: " + myBeautifulMap.root.left.key);
+        // System.out.println("root right: " + myBeautifulMap.root.right.key);
+        // System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+        // System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
+        // myBeautifulMap.put(8, "k");
+        // System.out.println("inserted 8");
+        // System.out.println("root: " + myBeautifulMap.root.key);
+        // System.out.println("root left: " + myBeautifulMap.root.left.key);
+        // System.out.println("root right: " + myBeautifulMap.root.right.key);
+        // System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+        // System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
+        // System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
 
         myBeautifulMap = new AVLMapFixed<Integer, String>();
         System.out.println("Right -------------");
-        myBeautifulMap.put(4, "k");
-        System.out.println("inserted 4");
-        myBeautifulMap.put(3, "k");
-        System.out.println("inserted 3");
+        myBeautifulMap.put(10, "k");
+        System.out.println("inserted 10");
         myBeautifulMap.put(5, "k");
         System.out.println("inserted 5");
-        myBeautifulMap.put(6, "k");
-        System.out.println("inserted 6");
+        myBeautifulMap.put(20, "k");
+        System.out.println("inserted 20");
+        myBeautifulMap.put(3, "k");
+        System.out.println("inserted 3");
         myBeautifulMap.put(7, "k");
         System.out.println("inserted 7");
+                myBeautifulMap.put(12, "k");
+        System.out.println("inserted 12");
+        myBeautifulMap.put(25, "k");
+        System.out.println("inserted 25");
+        myBeautifulMap.put(23, "k");
+        System.out.println("inserted 23");
+        myBeautifulMap.put(28, "k");
+        System.out.println("inserted 28");
+        myBeautifulMap.put(30, "k");
+        System.out.println("inserted 30");
         System.out.println("root: " + myBeautifulMap.root.key);
         System.out.println("root left: " + myBeautifulMap.root.left.key);
+                System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
+                        System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
         System.out.println("root right: " + myBeautifulMap.root.right.key);
         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
+                System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
+        System.out.println("root right left right: " + myBeautifulMap.root.right.left.right.key);
+        System.out.println("root right right left: " + myBeautifulMap.root.right.right.left.key);
+        System.out.println("root right right right: " + myBeautifulMap.root.right.right.right.key);
+        System.out.println("root right right right right: " + myBeautifulMap.root.right.right.right.right.key);
     }
 }
