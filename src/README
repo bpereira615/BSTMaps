@@ -1,0 +1,30 @@
+Benjamin Hoertnagl-Pereira
+bhoertn1
+631-488-7197 
+bhoertn1@jhu.edu
+
+Ryan Demo
+rdemo1
+rdemo1@jhu.edu
+
+600.226.02 CS226 Data Structures
+Project 3 - BST Maps
+Part 1
+
+Files:
+	MapJHU.java - interface to function similarly to Map ADT
+	
+	BSTMap.java - implementation of the MapJHU.java ADT using binary
+	search tree
+	
+	BSTMapTest.java - JUnit test suite modeled from project 2's LPHashMapTest.java
+	
+Summary:
+	We found the most difficult method to write to be the map's remove function because of
+	the number of edge cases; specifically, that of removing the root and taking different
+	cases for each of the configuration of children on a node. We have also implemented
+	remove() in the iterator. The iterator uses an ArrayList as an intermediate data type,
+	derived from the inOrder() method of BSTMap, as the intermediate data structure that
+	it iterates over. Our edited JUnit tests all check out.
+
+
