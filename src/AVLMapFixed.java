@@ -246,6 +246,7 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
                 curr.value = newNode.value;
                 curr.height = determineNewHeight(curr);
                 this.root = this.rebalance(root);
+
                 return value;
             } else if (diff == 0) { //node found with key, update and return old
                 V oldVal = curr.value;
@@ -262,6 +263,7 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
                 curr.value = newNode.value;
                 curr.height = determineNewHeight(curr);
                 this.root = this.rebalance(root);
+
                 return value;
             }
     }
@@ -820,16 +822,16 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
         // System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
 
         // System.out.println("Right -------------");
-        myBeautifulMap.put(10, "k");
+        myBeautifulMap.put(10, "kdwfwdf");
         System.out.println("inserted 10");
         myBeautifulMap.put(5, "k");
         System.out.println("inserted 5");
         myBeautifulMap.put(20, "k");
         System.out.println("inserted 20");
         myBeautifulMap.put(4, "k");
-        System.out.println("inserted 3");
+        System.out.println("inserted 4");
         myBeautifulMap.put(6, "k");
-        System.out.println("inserted 7");
+        System.out.println("inserted 6");
                 myBeautifulMap.put(12, "k");
         System.out.println("inserted 12");
         myBeautifulMap.put(25, "k");
@@ -838,15 +840,17 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
         System.out.println("inserted 2");
         myBeautifulMap.put(1, "k");
         System.out.println("inserted 1");
-        myBeautifulMap.put(3, "k");
-        System.out.println("inserted 3");
+        //myBeautifulMap.put(3, "k32");
+        //System.out.println("inserted 3");
+
+
         System.out.println("root: " + myBeautifulMap.root.key);
         System.out.println("root left: " + myBeautifulMap.root.left.key);
         System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
         System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
         System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
         // System.out.println("root left left left left: " + myBeautifulMap.root.left.left.left.left.key);
-        System.out.println("root left left left right: " + myBeautifulMap.root.left.left.left.right.key);
+        //System.out.println("root left left left right: " + myBeautifulMap.root.left.left.left.right.key);
         System.out.println("root right: " + myBeautifulMap.root.right.key);
         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
@@ -854,6 +858,6 @@ public class AVLMapFixed<K extends Comparable<? super K>, V>
         System.out.println("root right left right: " + myBeautifulMap.root.right.left.right.key);
         System.out.println("root right right left: " + myBeautifulMap.root.right.right.left.key);
         System.out.println("root right right right: " + myBeautifulMap.root.right.right.right.key);
-        System.out.println("root right right right right: " + myBeautifulMap.root.right.right.right.right.key);
+        //System.out.println("root right right right right: " + myBeautifulMap.root.right.right.right.right.key);
     }
 }

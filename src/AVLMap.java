@@ -310,7 +310,7 @@ public class AVLMap<K extends Comparable<? super K>, V>
         //in order search for position
         int diff = key.compareTo(curr.key);
         
-        if (curr.isLeaf() && diff != 0) {
+        if (curr.isLeaf()) {
             return null;
         }
         
@@ -320,13 +320,27 @@ public class AVLMap<K extends Comparable<? super K>, V>
             removedValue = this.remove(key, curr.left);
             curr.determineNewHeight();
             curr.left = this.rebalance(curr.left);
+            curr.determineNewHeight();
+
+/*            if (curr.key == this.root.key) {
+            	this.root = this.rebalance(this.root);
+            }*/
             
         } else if (diff > 0) {
+
+        	System.out.println("IN Remove: right subtree of root!");
             
             //if key is larger than root key, search right subtree
             removedValue = this.remove(key, curr.right);
             curr.determineNewHeight();
+            System.out.println("balance factor for node " +curr+" : " + curr.bf());
+            System.out.println("left: " + curr.left + "\tright: " );//+ curr.right);
             curr.right = this.rebalance(curr.right);
+            curr.determineNewHeight();
+
+/*            if (curr.key == this.root.key) {
+            	this.root = this.rebalance(this.root);
+            }*/
             
         } else if (curr.left.key != null && curr.right.key != null) {
             
@@ -458,8 +472,12 @@ public class AVLMap<K extends Comparable<? super K>, V>
                 //if left and right are both null, curr becomes null here
                 this.root = this.root.right;
             } else {
+
                 this.root.key = null;
                 this.root.value = null;
+
+                //TODO: check
+                this.root.height = -1;
             }
         } else {
             if (curr.left.key != null) {
@@ -468,8 +486,15 @@ public class AVLMap<K extends Comparable<? super K>, V>
                 //if left and right are both null, curr becomes null here
                 curr = curr.right;
             } else {
+
+
+            	System.out.println(curr.key + " to be deleted...");
                 curr.key = null;
                 curr.value = null;
+                curr.height = -1;
+                curr.left = new AVLNode(null, null);
+                curr.right = new AVLNode(null, null);
+                System.out.println("height: " +curr.height);
             }
         }
     }
@@ -482,6 +507,9 @@ public class AVLMap<K extends Comparable<? super K>, V>
         if (curr.left.isLeaf()) {
             curr.key = null;
             curr.value = null;
+            curr.height = -1;
+			curr.left = new AVLNode(null, null);
+			curr.right = new AVLNode(null, null);
             return null;
         }
 
@@ -872,5 +900,47 @@ public class AVLMap<K extends Comparable<? super K>, V>
         System.out.println("root left: " + myBeautifulMap.root.left.key);
         //System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
         System.out.println("root right: " + myBeautifulMap.root.right.key);
+
+
+        System.out.println("\n\nREMOVE test ----------------------");
+        myBeautifulMap = new AVLMap<Integer, String>();
+        myBeautifulMap.put(6, "six");
+        System.out.println("inserted 6");
+        myBeautifulMap.put(4, "k");
+        System.out.println("inserted 4");
+        myBeautifulMap.put(8, "k");
+        System.out.println("inserted 8");
+        myBeautifulMap.put(2, "k");
+        System.out.println("inserted 2");
+        myBeautifulMap.put(6, "six");
+        System.out.println("inserted 6");
+        myBeautifulMap.put(5, "k");
+        System.out.println("inserted 5");
+        myBeautifulMap.put(7, "k");
+        System.out.println("inserted 7");
+        myBeautifulMap.put(1, "k");
+        System.out.println("inserted 1");
+
+        System.out.println("Before Remove:");
+        System.out.println("root: " + myBeautifulMap.root.key);
+        System.out.println("root left: " + myBeautifulMap.root.left.key);
+        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
+        System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
+        System.out.println("root right: " + myBeautifulMap.root.right.key);
+        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+        System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
+
+        myBeautifulMap.remove(5);
+        System.out.println("removed 5");
+
+        System.out.println("After Remove:");
+        System.out.println("root: " + myBeautifulMap.root.key);
+        System.out.println("root left: " + myBeautifulMap.root.left.key);
+        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
+        System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
+        System.out.println("root right: " + myBeautifulMap.root.right.key);
+        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+        System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
+
     }
 }
