@@ -154,6 +154,7 @@ public class AVLMap<K extends Comparable<? super K>, V>
         return this.hasKey(key, this.root);
     }
 
+
     /** See if a key is in an entry in a subtree.
      *  @param key the key to search for
      *  @param curr the root of the subtree being searched
@@ -718,34 +719,51 @@ public class AVLMap<K extends Comparable<? super K>, V>
         return "( " + s + " )";
     }
 
-/*
-
-    public String breadthFrist() {
-    	//queue of nodes to be searched
-    	Queue<AVLNode> q = new LinkedList<>();
-    	//used to clear visited field after search
-    	LinkedList<AVLNode> nodes = new LinkedList<>();
-    	String s = "";
-
-    	q.add(this.root);
-    	nodes.add(this.root);
+    //http://www.algoqueue.com/algoqueue/default/view/8912896/check-binary-tree-balanced-or-not
+	public boolean checkBinaryTreeIsBalanced(AVLNode root){
 
 
-    	while(!q.isEmpty()) {
-    		AVLNode node = (AVLNode) q.remove();
-    		AVLNode child = null;
+	     if(computeAndCheckHeight(root) == -1)
+	          return false;
+	     else
+	          return true;
+	 }
 
-    		while ((child))
-    	}
+	public int computeAndCheckHeight(AVLNode root){
+	     /* Base case - Tree is empty */
+	     if(root.key == null)
+	          return 0;
+	     /* Height of left subtree */
+	     int leftSubTreeHeight = computeAndCheckHeight(root.left);
+	     /* Left subtree is not balanced */
+	     if(leftSubTreeHeight == -1)
+	          return -1;  
 
+	     /* Height of right subtree */
+	     int rightSubTreeHeight = computeAndCheckHeight(root.right);
+	     /* Right subtree is not balanced */
+	     if(rightSubTreeHeight == -1)
+	          return -1;
 
+	     /* Difference in height */
+	     int heightDifference = Math.abs(leftSubTreeHeight - rightSubTreeHeight);
+	     /* Root node is not balanced */
+	     if(heightDifference > 1)
+	          return -1;
+	     else
+	          /* Height of the root node */
+	          return Math.max(leftSubTreeHeight, rightSubTreeHeight) + 1;
+	 }
 
+	 public boolean isBalanced() {
+	 	return checkBinaryTreeIsBalanced(this.root);
+	 }
 
-    	return s;
-    }
-    */
     
     public static void main(String[] args) {
+
+    	int fail = 0;
+
         AVLMap<Integer, String> myBeautifulMap = new AVLMap<Integer, String>();
          System.out.println("Left -------------");
          myBeautifulMap.put(2, "k");
@@ -779,6 +797,16 @@ public class AVLMap<K extends Comparable<? super K>, V>
          System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
          System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
 
+
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+			System.out.println(1);
+		}
+         
+
+
+
+
          myBeautifulMap = new AVLMap<Integer, String>();
          System.out.println("Right1 -------------");
          myBeautifulMap.put(4, "k");
@@ -804,6 +832,10 @@ public class AVLMap<K extends Comparable<? super K>, V>
          System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
          //System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
          //System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
+
+        if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
 
          myBeautifulMap = new AVLMap<Integer, String>();
          System.out.println("Right2 -------------");
@@ -840,6 +872,10 @@ public class AVLMap<K extends Comparable<? super K>, V>
          System.out.println("root right right right: " + myBeautifulMap.root.right.right.right.key);
          System.out.println("root right right right right: " + myBeautifulMap.root.right.right.right.right.key);
 
+         		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
+
          System.out.println("Right3 -------------");
          myBeautifulMap = new AVLMap<Integer, String>();
          myBeautifulMap.put(10, "k");
@@ -861,6 +897,12 @@ public class AVLMap<K extends Comparable<? super K>, V>
          System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
 //         System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
          System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
+
+
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
+
 
         System.out.println("Right4 -------------");
         myBeautifulMap.put(10, "k");
@@ -884,23 +926,15 @@ public class AVLMap<K extends Comparable<? super K>, V>
         myBeautifulMap.put(3, "k");
         System.out.println("inserted 3");
         System.out.println(myBeautifulMap.toString());
-//        System.out.println("root: " + myBeautifulMap.root.key);
-//        System.out.println("root left: " + myBeautifulMap.root.left.key);
-//        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-//        System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-//        System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
-        // System.out.println("root left left left left: " + myBeautifulMap.root.left.left.left.left.key);
-//        System.out.println("root left left left right: " + myBeautifulMap.root.left.left.left.right.key);
-//        System.out.println("root right: " + myBeautifulMap.root.right.key);
-//        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-//        System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-//        System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
-//        System.out.println("root right left right: " + myBeautifulMap.root.right.left.right.key);
-//        System.out.println("root right right left: " + myBeautifulMap.root.right.right.left.key);
-//        System.out.println("root right right right: " + myBeautifulMap.root.right.right.right.key);
-//        System.out.println("root right right right right: " + myBeautifulMap.root.right.right.right.right.key);
+
         
         
+
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
+
+
         System.out.println("New test -------------");
         myBeautifulMap = new AVLMap<Integer, String>();
         myBeautifulMap.put(6, "k");
@@ -914,6 +948,9 @@ public class AVLMap<K extends Comparable<? super K>, V>
         //System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
         System.out.println("root right: " + myBeautifulMap.root.right.key);
 
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
 
         System.out.println("\n\nPUT- ROOT change test ----------------------");
         myBeautifulMap = new AVLMap<Integer, String>();
@@ -926,6 +963,10 @@ public class AVLMap<K extends Comparable<? super K>, V>
         System.out.println("root: " + myBeautifulMap.root.key);
         System.out.println("root left: " + myBeautifulMap.root.left.key);
         System.out.println("root right: " + myBeautifulMap.root.right.key);
+
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
 
 
         System.out.println("\n\nPUT ADVANCED test ----------------------");
@@ -974,7 +1015,9 @@ public class AVLMap<K extends Comparable<? super K>, V>
 
 
 
-        
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
 
 
 
@@ -1058,6 +1101,9 @@ public class AVLMap<K extends Comparable<? super K>, V>
         System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
         System.out.println("root right left right: " + myBeautifulMap.root.right.left.right.key);
 
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
 
         System.out.println("\n\nREMOVE test ----------------------");
         myBeautifulMap = new AVLMap<Integer, String>();
@@ -1097,6 +1143,13 @@ public class AVLMap<K extends Comparable<? super K>, V>
         System.out.println("root left right left: " + myBeautifulMap.root.left.right.left.key);
         System.out.println("root right: " + myBeautifulMap.root.right.key);
         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
+
+		if (!myBeautifulMap.isBalanced()) {
+			fail++;
+		}
+
+		System.out.println("failures: " + fail);
+
 
 
 
