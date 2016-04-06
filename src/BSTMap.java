@@ -9,7 +9,7 @@
  * rdemo1@jhu.edu
  *
  * 600.226.02 | CS226 Data Structures | Section 2
- * Project 3, Part A - Binary Search Tree
+ * Project 3, Part B - Balanced Binary Search Tree
  *
  *******************************************************************/
 

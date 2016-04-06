@@ -9,7 +9,7 @@
  * rdemo1@jhu.edu
  *
  * 600.226.02 | CS226 Data Structures | Section 2
- * Project 3, Part A - Binary Search Tree
+ * Project 3, Part B - Balanced Binary Search Tree
  *
  *******************************************************************/
 
@@ -29,7 +29,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 //entries and values sets
 import java.util.HashSet;
-import java.util.Queue;
 
 
 /** Binary Search Tree Map implementation with inner Node class.
@@ -39,9 +38,13 @@ import java.util.Queue;
 public class AVLMap<K extends Comparable<? super K>, V>
     implements MapJHU<K, V>, Iterable<Map.Entry<K, V>> {
 
+    //==========================================================================
+    // AVLNode Inner Class
+    //==========================================================================
+
     /** Inner node class.  Do not make this static because you want
         the K to be the same K as in the AVLMap header.
-    */
+     */
     protected class AVLNode {
 
         /** The key of the entry (null if sentinel node). */
@@ -52,16 +55,13 @@ public class AVLMap<K extends Comparable<? super K>, V>
         protected AVLNode left;
         /** The right child of this node. */
         protected AVLNode right;
-        
+
         /** The height of a node. */
         private int height;
 
-        /** For breadth first traversal, whether or not node has been visited */
-        private boolean visited;
-        
         /** Create a new node with a particular key and value.
-         *  @param key the key for the new node
-         *  @param val the value for the new node
+         *  @param k the key for the new node
+         *  @param v the value for the new node
          */
         AVLNode(K k, V v) {
             this.key = k;
@@ -69,9 +69,8 @@ public class AVLMap<K extends Comparable<? super K>, V>
             this.left = null;
             this.right = null;
             this.height = -1;
-            this.visited = false;
         }
-        
+
         /** Evaluate balance factor of the node by comparing
          * the height of its children, left - right.
          * @return balance factor
@@ -80,28 +79,30 @@ public class AVLMap<K extends Comparable<? super K>, V>
             if (this.isLeaf()) {
                 return 0;
             }
-
-            //System.out.println("height difference between " + this.left.key + " and " +this.right.key + ": "+ (this.left.height - this.right.height));
             return this.left.height - this.right.height;
         }
-        
+
         /**
          * toString method for BNode.
          * @return the string
          */
         public String toString() {
-            return "(" + this.key.toString() + " = " + this.value.toString() + ")";
+            if (this.isLeaf()) {
+                return "  X  ";
+            }
+            return "(" + this.key.toString() + ":"
+                + this.value.toString() + ")";
         }
-        
+
         /** Redetermines height of Node based on child heights.
          */
         private void determineNewHeight() {
-        	if (this.isLeaf()) {
-        		this.height = - 1;
-        	} else {
-            	this.height = Math.max(this.left.height, this.right.height) + 1;
-        	}
-            System.out.printf("%s: %d\n", this.key, height);
+            if (this.isLeaf()) {
+                this.height = -1;
+            } else {
+                this.height = Math.max(this.left.height, this.right.height) + 1;
+            }
+            System.out.printf("%s: %d\n", this.key, this.height);
         }
 
         /** Check whether this node is a leaf sentinel, based on key.
@@ -112,6 +113,11 @@ public class AVLMap<K extends Comparable<? super K>, V>
         }
     }
 
+
+    //==========================================================================
+    // Global Map Variables
+    //==========================================================================
+
     /** The root of this tree. */
     protected AVLNode root;
     /** The number of entries in this map (== non-sentinel nodes). */
@@ -119,6 +125,11 @@ public class AVLMap<K extends Comparable<? super K>, V>
     /** Keeps track of state for iterator, incremented
      * when put or remove is called. */
     protected int operations;
+
+
+    //==========================================================================
+    // Map Reading Functions
+    //==========================================================================
 
     /** Create an empty tree with a sentinel root node.
      */
@@ -149,11 +160,10 @@ public class AVLMap<K extends Comparable<? super K>, V>
         if (this.size == 0) {
             return false;
         }
-        
+
         //call helper function
         return this.hasKey(key, this.root);
     }
-
 
     /** See if a key is in an entry in a subtree.
      *  @param key the key to search for
@@ -211,7 +221,7 @@ public class AVLMap<K extends Comparable<? super K>, V>
 
         return false;
     }
-    
+
     @Override()
     public V get(K key) {
         return this.get(key, this.root);
@@ -244,6 +254,11 @@ public class AVLMap<K extends Comparable<? super K>, V>
         }
     }
 
+
+    //==========================================================================
+    // Map Writing Functions
+    //==========================================================================
+
     @Override()
     public V put(K key, V val) {
         //throw exception if key is null
@@ -255,16 +270,16 @@ public class AVLMap<K extends Comparable<? super K>, V>
             //increment size
             this.size++;
         }
-        
+
         V prevVal = this.put(key, val, this.root);
         this.root.determineNewHeight();
         if (Math.abs(this.root.bf()) > 1) {
             this.root = this.rebalance(this.root);
         }
         this.root.determineNewHeight();
-        
+
         this.operations++;
-        
+
         return prevVal;
     }
 
@@ -296,7 +311,8 @@ public class AVLMap<K extends Comparable<? super K>, V>
             prevVal = this.put(key, val, curr.left);
             curr.determineNewHeight();
             curr.left = this.rebalance(curr.left);
-        } else if (diff > 0) { //if key is larger than root key, search right subtree
+        } else if (diff > 0) {
+            //if key is larger than root key, search right subtree
             prevVal = this.put(key, val, curr.right);
             curr.determineNewHeight();
             curr.right = this.rebalance(curr.right);
@@ -370,42 +386,96 @@ public class AVLMap<K extends Comparable<? super K>, V>
         }
         return curr;  // this is essential!
     }
-    
+
+    /** Handles remove case where the node has 0 or 1 non-sentinel children.
+     * @param curr the AVLNode to remove
+     */
+    public void removeIncompleteSubTree(AVLNode curr) {
+        //edge case deleting root
+        if (curr.key == this.root.key) {
+            if (this.root.left.key != null) {
+                this.root = this.root.left;
+            } else if (this.root.right.key != null) {
+                //if left and right are both null, curr becomes null here
+                this.root = this.root.right;
+            } else {
+
+                this.root.key = null;
+                this.root.value = null;
+
+                this.root.height = -1;
+            }
+        } else {
+            if (curr.left.key != null) {
+                curr = curr.left;
+            } else if (curr.right.key != null) {
+                //if left and right are both null, curr becomes null here
+                curr = curr.right;
+            } else {
+                //System.out.println(curr.key + " to be deleted...");
+                curr.key = null;
+                curr.value = null;
+                curr.height = -1;
+                //System.out.println("height: " + curr.height);
+            }
+        }
+    }
+
+    /** Search subtree recursively and remove its smallest value.
+     * @param curr the subtree
+     * @return AVLNode with the min key
+     */
+    public AVLNode removeMin(AVLNode curr) {
+        if (curr.left.isLeaf()) {
+            curr.key = null;
+            curr.value = null;
+            curr.height = -1;
+            return null;
+        }
+
+        return this.removeMin(curr.left);
+    }
+
+
+    //==========================================================================
+    // Node Balancing and Rotation
+    //==========================================================================
+
     /** Rebalances tree by checking left and right heaviness of
      * the root and its left and right subtrees.
-     * @param root the root of subtree to balance
+     * @param curr the root of subtree to balance
      * @return balanced subtree root AVLNode
      */
     public AVLNode rebalance(AVLNode curr) {
-        
+
         if (curr.bf() < -1) { //curr is right heavy
             if (curr.right.bf() > 0) {
                 //if curr's right subtree is left heavy
-                System.out.println("doubleLR on "+ curr.key);
-                return doubleLR(curr);
+                //System.out.println("doubleLR on " + curr.key);
+                return this.doubleLR(curr);
             } else {
                 //curr's right subtree is not left heavy
-                System.out.println("singleLeft on "+ curr.key);
-                return singleLeft(curr);
+                //System.out.println("singleLeft on " + curr.key);
+                return this.singleLeft(curr);
             }
         } else if (curr.bf() > 1) { //curr is left heavy
             if (curr.left.bf() < 0) {
                 //curr's left subtree is right heavy
-                System.out.println("doubleRL on "+ curr.key);
-                return doubleRL(curr);
+                //System.out.println("doubleRL on " + curr.key);
+                return this.doubleRL(curr);
             } else {
                 //curr's left subtree is not right heavy
-                System.out.println("singleRight on "+ curr.key);
-                return singleRight(curr);
+                //System.out.println("singleRight on " + curr.key);
+                return this.singleRight(curr);
             }
-        } else {
-            System.out.println("No rebalance");
+            //} else {
+            //    System.out.println("No rebalance on " + curr.key);
         }
-        
+
         //if tree is balanced return itself
         return curr;
     }
-    
+
     /** Perform left rotation on an AVLNode.
      * @param curr AVLNode to left rotate
      * @return left rotated AVLNode
@@ -437,72 +507,76 @@ public class AVLMap<K extends Comparable<? super K>, V>
      * @return left-right rotated AVLNode
      */
     public AVLNode doubleLR(AVLNode curr) {
-        curr.right = singleRight(curr.right);
-        return singleLeft(curr);
+        curr.right = this.singleRight(curr.right);
+        return this.singleLeft(curr);
     }
-    
+
     /** Perform double right (right-left) rotation on an AVLNode.
      * @param curr AVLNode to double right rotate
      * @return right-left rotated AVLNode
      */
     public AVLNode doubleRL(AVLNode curr) {
-        curr.left = singleLeft(curr.left);
-        return singleRight(curr);
+        curr.left = this.singleLeft(curr.left);
+        return this.singleRight(curr);
     }
-    
-    
-    /** Handles remove case where the node has 0 or 1 non-sentinel children.
-     * @param curr the AVLNode to remove
+
+    /** Checks if a binary tree is balanced.
+     * Source: http://www.algoqueue.com/algoqueue/default/
+     * view/8912896/check-binary-tree-balanced-or-not
+     * @param curr root of subtree to check balance
+     * @return true if balanced, false if not
      */
-    public void removeIncompleteSubTree(AVLNode curr) {
-       //edge case deleting root
-        if (curr.key == this.root.key) {
-            if (this.root.left.key != null) {
-                this.root = this.root.left;
-            } else if (this.root.right.key != null) {
-                //if left and right are both null, curr becomes null here
-                this.root = this.root.right;
-            } else {
+    public boolean checkBinaryTreeIsBalanced(AVLNode curr) {
+        return !(this.computeAndCheckHeight(curr) == -1);
+    }
 
-                this.root.key = null;
-                this.root.value = null;
+    /** Computes and checks the height of a node.
+     * @param curr node to check height
+     * @return 0 if tree is empty, -1 if not balanced, else
+     * height of node
+     */
+    public int computeAndCheckHeight(AVLNode curr) {
+        /* Base case - Tree is empty */
+        if (curr.key == null) {
+            return 0; 
+        }
+        /* Height of left subtree */
+        int leftSubTreeHeight = this.computeAndCheckHeight(curr.left);
+        /* Left subtree is not balanced */
+        if (leftSubTreeHeight == -1) {
+            return -1; 
+        }
 
-                //TODO: check
-                this.root.height = -1;
-            }
+        /* Height of right subtree */
+        int rightSubTreeHeight = this.computeAndCheckHeight(curr.right);
+        /* Right subtree is not balanced */
+        if (rightSubTreeHeight == -1) {
+            return -1;
+        }
+
+        /* Difference in height */
+        int heightDifference = Math.abs(leftSubTreeHeight - rightSubTreeHeight);
+        /* curr node is not balanced */
+        if (heightDifference > 1) {
+            return -1;
         } else {
-            if (curr.left.key != null) {
-                curr = curr.left;
-            } else if (curr.right.key != null) {
-                //if left and right are both null, curr becomes null here
-                curr = curr.right;
-            } else {
-
-
-            	System.out.println(curr.key + " to be deleted...");
-                curr.key = null;
-                curr.value = null;
-                curr.height = -1;
-                System.out.println("height: " +curr.height);
-            }
-        }
+            // Height of the root (curr) node
+            return Math.max(leftSubTreeHeight, rightSubTreeHeight) + 1;
+        }            
     }
-    
-    /** Search subtree recursively and remove its smallest value.
-     * @param curr the subtree
-     * @return AVLNode with the min key
+
+    /** Check if entire tree is balanced.
+     * @return true if balanced, false if not
      */
-    public AVLNode removeMin(AVLNode curr) {
-        if (curr.left.isLeaf()) {
-            curr.key = null;
-            curr.value = null;
-            curr.height = -1;
-            return null;
-        }
-
-        return this.removeMin(curr.left);
+    public boolean isBalanced() {
+        return this.checkBinaryTreeIsBalanced(this.root);
     }
-    
+
+
+    //==========================================================================
+    // Set and Iterator Functions
+    //==========================================================================
+
     @Override()
     public Set<Map.Entry<K, V>> entries() {
         HashSet<Map.Entry<K, V>> entries = new HashSet<>();
@@ -534,31 +608,6 @@ public class AVLMap<K extends Comparable<? super K>, V>
         return values;
     }
 
-    /* -----   AVLMap-specific functions   ----- */
-
-    /** Get the smallest key in a subtree.
-     *  @param curr the root of the subtree to search
-     *  @return the min key
-     */
-    public K firstKey(AVLNode curr) {
-        if (curr.left.isLeaf()) {
-            return curr.key;
-        }
-
-        return this.firstKey(curr.left);
-    }
-
-    /** Get the smallest key in a subtree.
-     *  @param curr the root of the subtree to search
-     *  @return the max key
-     */
-    public K lastKey(AVLNode curr) {
-        if (curr.right.isLeaf()) {
-            return curr.key;
-        }
-
-        return this.lastKey(curr.right);
-    }
 
     /** Inorder traversal that produces an iterator over key-value pairs.
      *  @return an iterable list of entries ordered by keys
@@ -566,7 +615,7 @@ public class AVLMap<K extends Comparable<? super K>, V>
     public Iterable<Map.Entry<K, V>> inOrder() {
         return this.inOrder(this.root);
     }
-    
+
     /** Inorder traversal produces an iterator over entries in a subtree.
      *  @param curr the root of the subtree to iterate over
      *  @return an iterable list of entries ordered by keys
@@ -583,7 +632,7 @@ public class AVLMap<K extends Comparable<? super K>, V>
 
         //handle current "root"
         Map.Entry<K, V> entry = 
-            new AbstractMap.SimpleEntry<>(curr.key, curr.value);
+                new AbstractMap.SimpleEntry<>(curr.key, curr.value);
         ordered.add(entry);
 
         //handle right subtree
@@ -592,18 +641,18 @@ public class AVLMap<K extends Comparable<? super K>, V>
         return ordered;
     }
 
-        /** Returns a copy of the portion of this map whose keys are in a range.
+    /** Returns a copy of the portion of this map whose keys are in a range.
      *  @param fromKey the starting key of the range, inclusive if found
      *  @param toKey the ending key of the range, inclusive if found
      *  @return the resulting submap
      */
     public AVLMap<K, V> subMap(K fromKey, K toKey) {
-        
+
         AVLMap<K, V> sub = new AVLMap<K, V>();
-        
+
         Collection<Map.Entry<K, V>> orderedMap =
                 (Collection<Entry<K, V>>) this.inOrder();
-        
+
         for (Map.Entry<K, V> item : orderedMap) {
             if (item.getKey().compareTo(fromKey) >= 0
                     && item.getKey().compareTo(toKey) <= 0) {
@@ -613,7 +662,10 @@ public class AVLMap<K extends Comparable<? super K>, V>
         return sub;
     }
 
-    /* ---------- from Iterable ---------- */
+
+    //==========================================================================
+    // Override Iterable
+    //==========================================================================
 
     @Override
     public Iterator<Map.Entry<K, V>> iterator() {
@@ -631,7 +683,10 @@ public class AVLMap<K extends Comparable<? super K>, V>
         return null;
     }
 
-    /* -----  insert the AVLMapIterator inner class here ----- */
+
+    //==========================================================================
+    // AVLMapIterator Inner Class
+    //==========================================================================
 
     /**
      * Inner AVLMapIterator class for convenience.
@@ -650,7 +705,7 @@ public class AVLMap<K extends Comparable<? super K>, V>
         /** True if the iterator has just removed the last item it
          * iterated over. Used to filter out calling remove more than once. */
         boolean justRemoved;
-        
+
 
         /**
          * Make a AVLMapIterator.
@@ -680,7 +735,7 @@ public class AVLMap<K extends Comparable<? super K>, V>
 
         @Override
         public void remove() {
-            
+
             if (!this.justRemoved) {
                 if (this.operationsAtInit != AVLMap.this.operations) {
                     throw new ConcurrentModificationException();
@@ -692,11 +747,16 @@ public class AVLMap<K extends Comparable<? super K>, V>
             } else {
                 throw new IllegalStateException();
             }
-            
+
         }
     }
-    
-        /** Prints a tree visually in the output. Spacing isn't perfect
+
+
+    //==========================================================================
+    // Tree Printing
+    //==========================================================================
+
+    /** Prints a tree visually in the output. Spacing isn't perfect
      * but sentinels are included.
      */
     public void printTree() {
@@ -714,18 +774,17 @@ public class AVLMap<K extends Comparable<? super K>, V>
      */
     void printLevel(ArrayList<AVLNode> n) {
         ArrayList<AVLNode> next = new ArrayList<AVLNode>();  
-        for (int i = 0; i < n.get(0).height*2*5 + 3*(this.root.height - n.get(0).height) ; i++) {
+        for (int i = 0; i < n.get(0).height * 2 * ((1 + 1) * 2 + 1)
+                + (1 + 1 + 1) * (this.root.height - n.get(0).height); i++) {
             System.out.print(" ");
         }
 
         for (AVLNode t: n) {
-            for (int i = 0; i < 3; i++) {
-                System.out.print(" ");
-            }
-
-            if (n.get(0).height < this.root.height && n.indexOf(t) > 0 && n.indexOf(t)%2 == 0) {
+            if (n.get(0).height < this.root.height
+                    && n.indexOf(t) % 2 == 0) {
                 System.out.print("  ");
-                for (int i = 0; i < n.get(0).height + 3*(n.get(0).height); i++) {
+                for (int i = 0; i < n.get(0).height
+                        + (1 + 1 + 1) * (n.get(0).height); i++) {
                     System.out.print(" ");
                 }
             }
@@ -736,448 +795,12 @@ public class AVLMap<K extends Comparable<? super K>, V>
             }
             if (t.right != null) {
                 next.add(t.right);
-
             }
         }
-
         System.out.println();
-        if (next.size() != 0)
-            printLevel(next);
+        if (next.size() != 0) {
+            this.printLevel(next);
+        }
     }
 
-    //http://www.algoqueue.com/algoqueue/default/view/8912896/check-binary-tree-balanced-or-not
-	public boolean checkBinaryTreeIsBalanced(AVLNode root){
-
-
-	     if(computeAndCheckHeight(root) == -1)
-	          return false;
-	     else
-	          return true;
-	 }
-
-	public int computeAndCheckHeight(AVLNode root){
-	     /* Base case - Tree is empty */
-	     if(root.key == null)
-	          return 0;
-	     /* Height of left subtree */
-	     int leftSubTreeHeight = computeAndCheckHeight(root.left);
-	     /* Left subtree is not balanced */
-	     if(leftSubTreeHeight == -1)
-	          return -1;  
-
-	     /* Height of right subtree */
-	     int rightSubTreeHeight = computeAndCheckHeight(root.right);
-	     /* Right subtree is not balanced */
-	     if(rightSubTreeHeight == -1)
-	          return -1;
-
-	     /* Difference in height */
-	     int heightDifference = Math.abs(leftSubTreeHeight - rightSubTreeHeight);
-	     /* Root node is not balanced */
-	     if(heightDifference > 1)
-	          return -1;
-	     else
-	          /* Height of the root node */
-	          return Math.max(leftSubTreeHeight, rightSubTreeHeight) + 1;
-	 }
-
-	 public boolean isBalanced() {
-	 	return checkBinaryTreeIsBalanced(this.root);
-	 }
-
-    
-    public static void main(String[] args) {
-
-    	int fail = 0;
-
-        AVLMap<Integer, String> myBeautifulMap = new AVLMap<Integer, String>();
-         System.out.println("Left -------------");
-         myBeautifulMap.put(2, "k");
-         System.out.println("inserted 2");
-         myBeautifulMap.put(1, "k");
-         System.out.println("inserted 1");
-         myBeautifulMap.put(5, "k");
-         System.out.println("inserted 5");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         myBeautifulMap.put(4, "k");
-         System.out.println("inserted 4");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         myBeautifulMap.put(3, "k");
-         System.out.println("inserted 3");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-        
-        // // // // System.out.println("2: " + myBeautifulMap.get(2));
-        // // // // System.out.println("1: " + myBeautifulMap.get(1));
-        // // // // System.out.println("5: " + myBeautifulMap.get(5));
-        // // // // System.out.println("4: " + myBeautifulMap.get(4));
-        // // // // System.out.println("3: " + myBeautifulMap.get(3));
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-			System.out.println(1);
-		}
-         
-
-
-
-
-         myBeautifulMap = new AVLMap<Integer, String>();
-         System.out.println("Right1 -------------");
-         myBeautifulMap.put(4, "k");
-         System.out.println("inserted 4");
-         myBeautifulMap.put(3, "k");
-         System.out.println("inserted 3");
-         myBeautifulMap.put(5, "k");
-         System.out.println("inserted 5");
-         myBeautifulMap.put(6, "k");
-         System.out.println("inserted 6");
-         myBeautifulMap.put(7, "k");
-         System.out.println("inserted 7");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-         myBeautifulMap.put(8, "k");
-         System.out.println("inserted 8");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-         //System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
-         //System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-
-        if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-         myBeautifulMap = new AVLMap<Integer, String>();
-         System.out.println("Right2 -------------");
-         myBeautifulMap.put(10, "k");
-         System.out.println("inserted 10");
-         myBeautifulMap.put(5, "k");
-         System.out.println("inserted 5");
-         myBeautifulMap.put(20, "k");
-         System.out.println("inserted 20");
-         myBeautifulMap.put(3, "k");
-         System.out.println("inserted 3");
-         myBeautifulMap.put(7, "k");
-         System.out.println("inserted 7");
-                 myBeautifulMap.put(12, "k");
-         System.out.println("inserted 12");
-         myBeautifulMap.put(25, "k");
-         System.out.println("inserted 25");
-         myBeautifulMap.put(23, "k");
-         System.out.println("inserted 23");
-         myBeautifulMap.put(28, "k");
-         System.out.println("inserted 28");
-         myBeautifulMap.put(30, "k");
-         System.out.println("inserted 30");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-                 System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-                         System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-                 System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
-         System.out.println("root right left right: " + myBeautifulMap.root.right.left.right.key);
-         System.out.println("root right right left: " + myBeautifulMap.root.right.right.left.key);
-         System.out.println("root right right right: " + myBeautifulMap.root.right.right.right.key);
-         System.out.println("root right right right right: " + myBeautifulMap.root.right.right.right.right.key);
-
-         		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-         System.out.println("Right3 -------------");
-         myBeautifulMap = new AVLMap<Integer, String>();
-         myBeautifulMap.put(10, "k");
-         System.out.println("inserted 10");
-         myBeautifulMap.put(15, "k");
-         System.out.println("inserted 15");
-         myBeautifulMap.put(12, "k");
-         System.out.println("inserted 12");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-//         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-         myBeautifulMap.put(8, "k");
-         System.out.println("inserted 8");
-         System.out.println("root: " + myBeautifulMap.root.key);
-         System.out.println("root left: " + myBeautifulMap.root.left.key);
-         System.out.println("root right: " + myBeautifulMap.root.right.key);
-         System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-//         System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
-         System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-
-        System.out.println("Right4 -------------");
-        myBeautifulMap.put(10, "k");
-        System.out.println("inserted 10");
-        myBeautifulMap.put(5, "k");
-        System.out.println("inserted 5");
-        myBeautifulMap.put(20, "k");
-        System.out.println("inserted 20");
-        myBeautifulMap.put(4, "k");
-        System.out.println("inserted 3");
-        myBeautifulMap.put(6, "k");
-        System.out.println("inserted 7");
-                myBeautifulMap.put(12, "k");
-        System.out.println("inserted 12");
-        myBeautifulMap.put(25, "k");
-        System.out.println("inserted 25");
-        myBeautifulMap.put(2, "k");
-        System.out.println("inserted 2");
-        myBeautifulMap.put(1, "k");
-        System.out.println("inserted 1");
-        myBeautifulMap.put(3, "k");
-        System.out.println("inserted 3");
-        System.out.println(myBeautifulMap.toString());
-
-        
-        
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-
-        System.out.println("New test -------------");
-        myBeautifulMap = new AVLMap<Integer, String>();
-        myBeautifulMap.put(6, "k");
-        System.out.println("inserted 6");
-        myBeautifulMap.put(4, "k");
-        System.out.println("inserted 4");
-        myBeautifulMap.put(5, "k");
-        System.out.println("inserted 5");
-        System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        //System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-        System.out.println("\n\nPUT- ROOT change test ----------------------");
-        myBeautifulMap = new AVLMap<Integer, String>();
-        myBeautifulMap.put(3, "six");
-        System.out.println("inserted 3");
-        myBeautifulMap.put(2, "k");
-        System.out.println("inserted 2");
-         myBeautifulMap.put(1, "k");
-        System.out.println("inserted 1");
-        System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-
-        System.out.println("\n\nPUT ADVANCED test ----------------------");
-        myBeautifulMap = new AVLMap<Integer, String>();
-        myBeautifulMap.put(6, "six");
-        System.out.println("inserted 6");
-        myBeautifulMap.put(4, "k");
-        System.out.println("inserted 4");
-        myBeautifulMap.put(8, "k");
-        System.out.println("inserted 8");
-        myBeautifulMap.put(2, "k");
-        System.out.println("inserted 2");
-        myBeautifulMap.put(5, "k");
-        System.out.println("inserted 5");
-        myBeautifulMap.put(7, "k");
-        System.out.println("inserted 7");
-        myBeautifulMap.put(1, "k");
-        System.out.println("inserted 1");
-        myBeautifulMap.put(3, "k");
-        System.out.println("inserted 3");
-        myBeautifulMap.put(0, "k");
-        System.out.println("inserted 0");
-
-
-        System.out.println("Before Remove:");
-        System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-        System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-        System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
-        System.out.println("root left right left: " + myBeautifulMap.root.left.right.left.key);
-        System.out.println("root left right right: " + myBeautifulMap.root.left.right.right.key);
-
-
-        System.out.println(myBeautifulMap.get(6));
-        System.out.println(myBeautifulMap.get(4));
-        System.out.println(myBeautifulMap.get(8));
-        System.out.println(myBeautifulMap.get(2));
-        System.out.println(myBeautifulMap.get(5));
-        System.out.println(myBeautifulMap.get(7));
-        System.out.println(myBeautifulMap.get(1));
-        System.out.println(myBeautifulMap.get(3));
-        System.out.println(myBeautifulMap.get(0));
-
-
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-
-
-        System.out.println("\n\nREMOVE test 2 ----------------------");
-        myBeautifulMap = new AVLMap<Integer, String>();
-        myBeautifulMap.put(10, "six");
-        System.out.println("inserted 10");
-        myBeautifulMap.put(5, "k");
-        System.out.println("inserted 5");
-        myBeautifulMap.put(20, "k");
-        System.out.println("inserted 20");
-        myBeautifulMap.put(2, "k");
-        System.out.println("inserted 2");
-        myBeautifulMap.put(7, "six");
-        System.out.println("inserted 7");
-        myBeautifulMap.put(15, "k");
-        System.out.println("inserted 15");
-        myBeautifulMap.put(25, "k");
-        System.out.println("inserted 25");
-        myBeautifulMap.put(1, "k");
-        System.out.println("inserted 1");
-        myBeautifulMap.put(4, "k");
-        System.out.println("inserted 4");
-        myBeautifulMap.put(6, "k");
-        System.out.println("inserted 6");
-        myBeautifulMap.put(9, "k");
-        System.out.println("inserted 9");
-        myBeautifulMap.put(17, "k");
-        System.out.println("inserted 17");
-        myBeautifulMap.put(3, "k");
-        System.out.println("inserted 3");
-        myBeautifulMap.put(8, "k");
-        System.out.println("inserted 8");
-
-        System.out.println("Before Remove:");
-        System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
- 
-
-        System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
-        System.out.println("root left left right: " + myBeautifulMap.root.left.left.right.key);
-        System.out.println("root left left right left: " + myBeautifulMap.root.left.left.right.left.key);
-       	System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-
-       	System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-       	System.out.println("root left right left: " + myBeautifulMap.root.left.right.left.key);
-        System.out.println("root left right right: " + myBeautifulMap.root.left.right.right.key);
-        System.out.println("root left right right left: " + myBeautifulMap.root.left.right.right.left.key);
-
-
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-        System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-        System.out.println("root right left right: " + myBeautifulMap.root.right.left.right.key);
-        
-
-
-        myBeautifulMap.remove(10);
-        System.out.println("removed 10");
-
-        System.out.println("\nAfter Remove:");
-		System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
- 
-
-        System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
-        System.out.println("root left left right: " + myBeautifulMap.root.left.left.right.key);
-        //System.out.println("root left left right left: " + myBeautifulMap.root.left.left.right.left.key);
-       	System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-
-       	System.out.println("root left right left: " + myBeautifulMap.root.left.right.left.key);
-        System.out.println("root left right right: " + myBeautifulMap.root.left.right.right.key);
-        //System.out.println("root left right right left: " + myBeautifulMap.root.left.right.right.left.key);
-
-
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-        System.out.println("root right right: " + myBeautifulMap.root.right.right.key);
-        System.out.println("root right left left: " + myBeautifulMap.root.right.left.left.key);
-        System.out.println("root right left right: " + myBeautifulMap.root.right.left.right.key);
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-        System.out.println("\n\nREMOVE test ----------------------");
-        myBeautifulMap = new AVLMap<Integer, String>();
-        myBeautifulMap.put(60, "six");
-        System.out.println("inserted 6");
-        myBeautifulMap.put(40, "k");
-        System.out.println("inserted 4");
-        myBeautifulMap.put(80, "k");
-        System.out.println("inserted 8");
-        myBeautifulMap.put(20, "k");
-        System.out.println("inserted 2");
-        myBeautifulMap.put(50, "six");
-        System.out.println("inserted 5");
-        myBeautifulMap.put(70, "k");
-        System.out.println("inserted 7");
-        myBeautifulMap.put(45, "k");
-        System.out.println("inserted 1");
-
-        System.out.println("Before Remove:");
-        System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-        System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-        System.out.println("root left right left: " + myBeautifulMap.root.left.right.left.key);
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-        //System.out.println("root left left left: " + myBeautifulMap.root.left.left.left.key);
-
-        myBeautifulMap.remove(20);
-        System.out.println("removed 20");
-
-        System.out.println("After Remove:");
-        System.out.println("root: " + myBeautifulMap.root.key);
-        System.out.println("root left: " + myBeautifulMap.root.left.key);
-        System.out.println("root left left: " + myBeautifulMap.root.left.left.key);
-        System.out.println("root left right: " + myBeautifulMap.root.left.right.key);
-        System.out.println("root left right left: " + myBeautifulMap.root.left.right.left.key);
-        System.out.println("root right: " + myBeautifulMap.root.right.key);
-        System.out.println("root right left: " + myBeautifulMap.root.right.left.key);
-
-		if (!myBeautifulMap.isBalanced()) {
-			fail++;
-		}
-
-		System.out.println("failures: " + fail);
-
-
-
-
-    }
 }
