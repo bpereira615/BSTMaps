@@ -60,26 +60,32 @@ public class P3C1 {
 
         //---------- most frequent word(s) ----------
 
-        //TODO: multiple most frequent words
-
         //array of frequencies, index corresponding to words array
         ArrayList<Integer> freq = new ArrayList<>();
         for (String w : words) {
         	freq.add(hashmap.get(w));
         }
 
-        int maxIndex = 0, currIndex = 0;
+        int currIndex = 0;
+        ArrayList<Integer> maxIndex = new ArrayList<>();
         Integer maxVal = new Integer(0);
 
         for (Integer i : freq) {
         	if (i.compareTo(maxVal) > 0) {
         		maxVal = i;
-        		maxIndex = currIndex;
-        	}
+                //reset max values
+                maxIndex.clear();
+        		maxIndex.add(currIndex);
+        	} else if (i.compareTo(maxVal) == 0) {
+                maxIndex.add(currIndex);
+            }
         	currIndex ++;
         }
 
-        String s = words.get(maxIndex);
+        String s = "";
+        for (Integer i : maxIndex) {
+            s += words.get(i) + ", ";
+        }
       	System.out.println("Most frequent word(s): " + s);
 
         //---------- all words that occurr at most three times ----------
