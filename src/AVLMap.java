@@ -696,27 +696,53 @@ public class AVLMap<K extends Comparable<? super K>, V>
         }
     }
     
-    // TODO: Remove
-    @Override
-    public String toString() {
-        return "total height: " + this.root.height + "\n" + this.toString(this.root);
-    }
-    
-    /**
-     * prints the submap into a string of (left map) root (right map).
-     * @param curr the current node
-     * @return the current node's to String
+        /** Prints a tree visually in the output. Spacing isn't perfect
+     * but sentinels are included.
      */
-    private String toString(AVLNode curr) {
-        String s = "";
-        if (!curr.left.isLeaf()) {
-            s = s + this.toString(curr.left) + "/ ";
+    public void printTree() {
+        ArrayList<AVLNode> ra = new ArrayList<AVLNode>();
+        ra.add(this.root);
+        this.printLevel(ra);
+        System.out.println("total height: " + this.root.height);
+    }
+
+    /** Breadth-first traversal of tree given an initial ArrayList
+     * containing nodes on a particular level of the tree. toString()
+     * calls this function with a new ArrayList only containing the
+     * map's root. Spacing of output is not perfect.
+     * @param n ArrayList of root nodes
+     */
+    void printLevel(ArrayList<AVLNode> n) {
+        ArrayList<AVLNode> next = new ArrayList<AVLNode>();  
+        for (int i = 0; i < n.get(0).height*2*5 + 3*(this.root.height - n.get(0).height) ; i++) {
+            System.out.print(" ");
         }
-        s = s + curr.toString();// + " " + curr.height;
-        if (!curr.right.isLeaf()) {
-            s = s + " \\" + this.toString(curr.right);
+
+        for (AVLNode t: n) {
+            for (int i = 0; i < 3; i++) {
+                System.out.print(" ");
+            }
+
+            if (n.get(0).height < this.root.height && n.indexOf(t) > 0 && n.indexOf(t)%2 == 0) {
+                System.out.print("  ");
+                for (int i = 0; i < n.get(0).height + 3*(n.get(0).height); i++) {
+                    System.out.print(" ");
+                }
+            }
+
+            System.out.print(t.toString() + " ");
+            if (t.left != null) {
+                next.add(t.left);
+            }
+            if (t.right != null) {
+                next.add(t.right);
+
+            }
         }
-        return "( " + s + " )";
+
+        System.out.println();
+        if (next.size() != 0)
+            printLevel(next);
     }
 
     //http://www.algoqueue.com/algoqueue/default/view/8912896/check-binary-tree-balanced-or-not
