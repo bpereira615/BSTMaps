@@ -41,16 +41,16 @@ public class BSTMap<K extends Comparable<? super K>, V>
     /** Inner node class.  Do not make this static because you want
         the K to be the same K as in the BSTMap header.
     */
-    private class BNode {
+    protected class BNode {
 
         /** The key of the entry (null if sentinel node). */
-        private K key;
+        protected K key;
         /** The value of the entry (null if sentinel node). */
-        private V value;
+        protected V value;
         /** The left child of this node. */
-        private BNode left;
+        protected BNode left;
         /** The right child of this node. */
-        private BNode right;
+        protected BNode right;
 
         /** Create a new node with a particular key and value.
          *  @param k the key for the new node

@@ -59,6 +59,9 @@ public class P3C1 {
 
 
         //---------- most frequent word(s) ----------
+
+        //TODO: multiple most frequent words
+
         //array of frequencies, index corresponding to words array
         ArrayList<Integer> freq = new ArrayList<>();
         for (String w : words) {
@@ -69,14 +72,14 @@ public class P3C1 {
         Integer maxVal = new Integer(0);
 
         for (Integer i : freq) {
-        	if (i.copmareTo(maxVal) > 0) {
+        	if (i.compareTo(maxVal) > 0) {
         		maxVal = i;
         		maxIndex = currIndex;
         	}
         	currIndex ++;
         }
 
-        String s = words.at(maxIndex);
+        String s = words.get(maxIndex);
       	System.out.println("Most frequent word(s): " + s);
 
         //---------- all words that occurr at most three times ----------
