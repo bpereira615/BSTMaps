@@ -89,9 +89,18 @@ public class P3C1 {
       	System.out.println("Most frequent word(s): " + s);
 
         //---------- all words that occurr at most three times ----------
+        s = "";
 
+        currIndex = 0;
+        for (Integer i : freq) {
+            if (i.compareTo(3) <= 0) {
+                s += words.get(currIndex) + ", ";
+            } 
+            currIndex++;
+        }
 
        	//---------- words that occurr in top 10% of most frequent word ----------
-
+        
+        
 	}
 }
