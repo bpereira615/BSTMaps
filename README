@@ -12,7 +12,7 @@ Project 3 - BST Maps
 Part B - Balanced Binary Search Tree Implementation
 
 Files:
-	MapJHU.java - interface to function similarly to Map ADT
+	MapJHU.java - interface to function similar to Map ADT
 	
 	AVLMap.java - implementation of the MapJHU.java ADT using binary
 	search tree, balancing according to AVL principle
@@ -25,4 +25,4 @@ Summary:
 	the number of edge cases; specifically, that of removing the root and taking different
 	cases for each of the configuration of children on a node. Conceptually, we understood 
 	the basics of the rebalancing, which cases to trigger when, and the difference between
-	rebalancing after an insert and after a remove.
+	rebalancing after an insert and after a remove. No errors to report.
