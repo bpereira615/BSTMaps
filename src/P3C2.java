@@ -51,20 +51,27 @@ public final class P3C2 {
      */
     public static void main(String[] args) {
 
+        System.out.println("Input words below, separated by whitespace:");
         Scanner cnsl = new Scanner(System.in);
+        Scanner inline;
+        String line;
 
         //array of words
         ArrayList<String> words = new ArrayList<>();
 
         //insert words into array before start
-        while (cnsl.hasNext()) {
-            words.add(cnsl.next());
+        while (cnsl.hasNextLine()) {
+            line = cnsl.nextLine();
+            inline = new Scanner(line);
+            while (inline.hasNext()) {
+                words.add(inline.next());
+            }
         }
-        
+
         cnsl.close();
         
         if (words.size() >= ONE_HUNDRED) {
-            System.out.println("First 100 Words - Implementation Times");
+            System.out.println("First 100 Words - Insertion Times");
             analyzeList(words.subList(0, ONE_HUNDRED));
             System.out.println();
         } else {
@@ -72,13 +79,13 @@ public final class P3C2 {
         }
         
         if (words.size() >= ONE_THOUSAND) {
-            System.out.println("First 1000 Words - Implementation Times");
+            System.out.println("First 1000 Words - Insertion Times");
             analyzeList(words.subList(0, ONE_THOUSAND));
             System.out.println();
         } 
         
         if (words.size() >= ONE_HUNDRED_THOUSAND) {
-            System.out.println("First 100,000 Words - Implementation Times");
+            System.out.println("First 100,000 Words - Insertion Times");
             analyzeList(words.subList(0, ONE_HUNDRED_THOUSAND));
             System.out.println();
         }

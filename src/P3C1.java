@@ -39,14 +39,21 @@ public final class P3C1 {
      */
     public static void main(String[] args) {
 
+        System.out.println("Input words below, separated by whitespace:");
         Scanner cnsl = new Scanner(System.in);
+        Scanner inline;
+        String line;
 
         //array of words
         ArrayList<String> words = new ArrayList<>();
 
         //insert words into array before start
-        while (cnsl.hasNext()) {
-            words.add(cnsl.next());
+        while (cnsl.hasNextLine()) {
+            line = cnsl.nextLine();
+            inline = new Scanner(line);
+            while (inline.hasNext()) {
+                words.add(inline.next());
+            }
         }
 
         cnsl.close();
@@ -134,8 +141,10 @@ public final class P3C1 {
         ArrayList<Integer> sortedKeys =
                 new ArrayList<Integer>(freqToWord.keySet());
         Collections.sort(sortedKeys);
-
+        
+        System.out.println("Sorted keys: " + sortedKeys);
         int size = wordToFreq.size() / TEN; //integer division
+        System.out.println("Size: " + size);
         int index = sortedKeys.size() - 1; //start from end of array
         while (top10FreqWords.size() <= size) {
             top10FreqWords.addAll(freqToWord.get(sortedKeys.indexOf(index)));
