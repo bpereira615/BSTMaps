@@ -9,7 +9,7 @@ rdemo1@jhu.edu
 
 600.226.02 CS226 Data Structures
 Project 3 - BST Maps
-Part 2
+Part C - Fun with Maps
 
 Files:
 	MapJHU.java - interface to function similarly to Map ADT
@@ -17,12 +17,26 @@ Files:
 	AVLMap.java - implementation of the MapJHU.java ADT using binary
 	search tree, balancing according to AVL principle
 	
-	AVLTest.java - test class (not JUnit) we used to debug AVLMap
+	BSTMap.java - implementation of the MapJHU.java ADT using binary
+	search tree
 	
+	P3C1.java - utility class that prints total number of words, most
+	frequent words, all words that occur at most three times, and all
+	words that occur within the top 10% of the most frequent words.
+	
+	P3C2.java - utility class that takes in list of words from console
+	and analyzes their insertion into a HashMap, BSTMap and TreeMap at
+	the 100, 1000, and 100000 word levels.
+	
+	DocToWord.java - generates list of words separated by white space
+	from a document
+	
+	100.txt - 100 randomly generated words with line breaks
+	
+	1000.txt - 1000 randomly generated words with line breaks
+	
+	100000.txt - 100000 randomly generated words with line breaks
 	
 Summary:
-	We found the most difficult method to write to be the map's remove function because of
-	the number of edge cases; specifically, that of removing the root and taking different
-	cases for each of the configuration of children on a node. Conceptually, we understood 
-	the basics of the rebalancing, which cases to trigger when, and the difference between
-	rebalancing after an insert and after a remove.
+	All work without error. Use 'java P3C1 < 100000.txt' in the command line,
+	for example, to execute program.
