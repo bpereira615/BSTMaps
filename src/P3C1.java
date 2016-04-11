@@ -39,7 +39,6 @@ public final class P3C1 {
      */
     public static void main(String[] args) {
 
-        System.out.println("Input words below, separated by whitespace:");
         Scanner cnsl = new Scanner(System.in);
         Scanner inline;
         String line;
@@ -105,6 +104,7 @@ public final class P3C1 {
         //---------- total number of words in the document ----------
         int numWords = wordToFreq.size();
         System.out.println("Total number of words: " + numWords);
+        System.out.println();
 
 
         //---------- most frequent word(s) ----------
@@ -119,6 +119,7 @@ public final class P3C1 {
 
         ArrayList<String> freqWords = freqToWord.get(max);
         System.out.println("Most frequent word(s): " + freqWords);
+        System.out.println();
 
 
         //---------- all words that occur at most three times ----------
@@ -132,6 +133,7 @@ public final class P3C1 {
         }
 
         System.out.println("Words occurring at most 3 times: " + wordSet);
+        System.out.println();
 
 
         //----- words that occur in top 10% of most frequent words -----
@@ -142,16 +144,15 @@ public final class P3C1 {
                 new ArrayList<Integer>(freqToWord.keySet());
         Collections.sort(sortedKeys);
         
-        System.out.println("Sorted keys: " + sortedKeys);
         int size = wordToFreq.size() / TEN; //integer division
-        System.out.println("Size: " + size);
         int index = sortedKeys.size() - 1; //start from end of array
         while (top10FreqWords.size() <= size) {
-            top10FreqWords.addAll(freqToWord.get(sortedKeys.indexOf(index)));
+            top10FreqWords.addAll(freqToWord.get(sortedKeys.get(index)));
             index--; //decrement every time to get lower frequency words
         }
 
         System.out.println("Top 10% of most frequent words: " + top10FreqWords);
+        System.out.println();
 
     }
 
