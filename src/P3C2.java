@@ -51,7 +51,6 @@ public final class P3C2 {
      */
     public static void main(String[] args) {
 
-        System.out.println("Input words below, separated by whitespace:");
         Scanner cnsl = new Scanner(System.in);
         Scanner inline;
         String line;
