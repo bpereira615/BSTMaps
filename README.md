@@ -58,19 +58,19 @@ Finally, we will have an opportunity to see the impact of different map structur
 
 4. Once the entire list of words is read, create a reverse index by extracting all key value pairs in your map and inserting the string into a second AVLMap. This AVLMap uses a key that is the count and the data is the words that have that count. Note that this is now a dictionary (i.e. multiple words may have the same count), so use a collection of some sort to hold the words associated with the count.
 
+
+
 From here, we will explore two uses of our program:
 
 1. Create an implementation (name your file with main P3C1.java) that after reading in all the words, prints the following:
-* The total number of words in the document. [Clarification: total means total, not unique.]
-* The most frequent word(s).
-* All words that occur at most three times.
-* All words that occur within the top 10% of the most frequent word. [Clarification: Print the 10% of the words that occur most frequently (ie, the top 10% of all words if the words are sorted by frequency), as well as any other words that have the same frequency as those in the top 10%. Words should be output in order of most frequent to least. (Also in other words, all the words in the lists for the counts that contain the top 10% most frequent words.)]
-
+..* The total number of words in the document. [Clarification: total means total, not unique.]
+..* The most frequent word(s).
+..* All words that occur at most three times.
+..* All words that occur within the top 10% of the most frequent word. [Clarification: Print the 10% of the words that occur most frequently (ie, the top 10% of all words if the words are sorted by frequency), as well as any other words that have the same frequency as those in the top 10%. Words should be output in order of most frequent to least. (Also in other words, all the words in the lists for the counts that contain the top 10% most frequent words.)]
 
 2. Create an implementation (name your file with main P3C2.java) that does the following:
-
-* Creates 1) hashmap; 2) a BSTMap (unbalanced tree from part A); and 3) an AVLMap (balanced tree map from part B or the Java API TreeMap).
-* Read the words into an array of strings before you start.
-* Time the amount of time it takes to create the map (steps 1-3 above) for each instantiation
-* Prints the time it took for each of the three implementation styles.
-* Do this for a list of 100, 1000, and 100,000 words. [Clarification: read words and process the first 100, the first 1000 and the first 100,000 if there are that many.]
+..* Creates 1) hashmap; 2) a BSTMap (unbalanced tree from part A); and 3) an AVLMap (balanced tree map from part B or the Java API TreeMap).
+..* Read the words into an array of strings before you start.
+..* Time the amount of time it takes to create the map (steps 1-3 above) for each instantiation
+..* Prints the time it took for each of the three implementation styles.
+..* Do this for a list of 100, 1000, and 100,000 words. [Clarification: read words and process the first 100, the first 1000 and the first 100,000 if there are that many.]
